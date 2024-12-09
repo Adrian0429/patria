@@ -56,9 +56,25 @@
         @csrf
         @method('PUT')
         <div class="mb-3">
+                <label for="card_id" class="form-label">Card ID</label>
+                <input type="text" class="form-control" id="card_id" name="card_id" value="{{ $user->card_id }}">
+            </div>
+            <div class="mb-3">
+                <label for="user_id" class="form-label">User ID</label>
+                <input type="text" class="form-control" id="user_id" name="user_id" value="{{ $user->user_id }}">
+            </div>
+        <div class="mb-3">
             <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
             <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="{{ $user->nama_lengkap }}">
         </div>
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ $user->email }}">
+        </div>
+        <div class="mb-3">
+                <label for="password" class="form-label">password</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+            </div>
         <div class="mb-3">
             <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
             <select class="form-select" id="jenis_kelamin" name="jenis_kelamin">

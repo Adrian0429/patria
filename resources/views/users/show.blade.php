@@ -1,16 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
+    <!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Patria</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <title>User Details</title>
-
     <style>
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
-            background: #3a7bd5;
+            background: url('{{ asset('./bg_patria.PNG') }}') no-repeat center center;
+            background-size: cover;
             color: white;
             min-height: 100vh;
             display: flex;
@@ -19,37 +19,36 @@
         }
 
         .container {
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(11, 25, 44, 0.8);
             border-radius: 16px;
             padding: 1.5rem;
-            max-width: 60%;
+            max-width: 55%;
             width: 100%;
-            height: 70vh;
+            height: 55vh;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: row;
             align-items: center;
-            justify-content: space-between;
         }
         
         .user-picture-container {
-            width: 45%;
+            max-width:45%;
             height: 100%;
+            position: relative; 
             border-radius: 12px;
+            margin: 0 2rem;
         }
 
         .user-picture {
-            position: relative;
             width: 100%;
             height: 100%;
-            background-size: cover; 
+            background-size: contain; 
             background-repeat: no-repeat;
             background-position: center;
             border-radius: 12px;
         }
 
         .info {
-            width: 50%;
             text-align: start;
         }
 
@@ -67,7 +66,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             font-weight: 600;
-            background: #3a7bd5;
+            background: #133E87;
             color: white;
             text-decoration: none;
             border: none;
@@ -88,9 +87,8 @@
     <div class="container">
         @if($user->image_link)
         <div class="user-picture-container">
-            <div class="user-picture" style="background-image: url('{{ asset('storage/' . $user->image_link) }}');"></div>
+            <img class="user-picture" src="{{ asset('storage/' . $user->image_link) }}"/>
         </div>
-            
         @endif
         <div class="info">
             <h1>
@@ -102,9 +100,7 @@
             <p><strong>Tanggal Lahir:</strong> {{ $user->tanggal_lahir }}</p>
             <p><strong>Golongan Darah:</strong> {{ $user->golongan_darah }}</p>
             <p><strong>Vihara:</strong> {{ $user->vihara }}</p>
-            <a href="/" class="btn">Back</a>
-        </div>
-        
+            <a href="{{ url()->previous() }}" class="btn">Back</a>    </div>
     </div>
 </body>
 </html>

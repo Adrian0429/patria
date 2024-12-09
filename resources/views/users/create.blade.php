@@ -51,6 +51,7 @@
     </style>
 </head>
 <div class="container mt-5">
+    @include('partials.navbar')
     <h1 class="text-center text-primary">Create New User</h1>
     <div class="card p-4 mt-4 shadow-sm">
         <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
@@ -93,6 +94,14 @@
                     <option value="A">A</option>
                     <option value="B">B</option>
                     <option value="AB">AB</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">Jabatan</label>
+                <select class="form-select" id="role" name="role" required>
+                    <option value="DPP">DPP</option>
+                    <option value="DPC">DPC</option>
+                    <option value="User">Anggota</option>
                 </select>
             </div>
             <div class="mb-3">

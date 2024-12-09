@@ -11,25 +11,31 @@
 
     <style>
         body {
-            margin: 0;
             font-family: 'Poppins', sans-serif;
-            background: #3a7bd5;
-            color: white;
+            background: url('{{ asset('./bg_polos.PNG') }}') no-repeat center center;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
             height: 100vh;
+        }
+
+        .main-container { 
             display: flex;
             justify-content: center;
             align-items: center;
+            height: calc(100vh - 60px);
         }
 
         .container {
             text-align: center;
-            background: rgba(0, 0, 0, 0.55);
-            padding: 2rem;
+            background: rgba(11, 25, 44, 0.9);
+            padding: 0.5rem;
             border-radius: 12px;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             max-width: 500px;
             width: 100%;
-
+            color: white;
         }
 
         h1 {
@@ -38,10 +44,6 @@
             font-size: 2rem;
         }
 
-        p {
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
 
         #scanner-container {
             margin: 0 auto;
@@ -49,13 +51,12 @@
             height: 300px;
             display: flex;
             border: none !important;
-            outline: none; /* Remove focus outline if any */
-            box-shadow: none; /* Remove shadow effects, if any */
-            
+            outline: none;
+            box-shadow: none;
         }
 
         #html5-qrcode-button-camera-stop {
-            display: none !important; 
+            display: none !important;
         }
 
         input {
@@ -74,6 +75,8 @@
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             font-weight: 600;
+            width: 100%;
+            max-width: 300px;
             background: #3a7bd5;
             color: white;
             border: none;
@@ -84,26 +87,53 @@
             margin: 10px 0;
         }
 
+        .btnSubmit{
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            width: 100%;
+            display: none;
+            max-width: 300px;
+            background: #3a7bd5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px 0;
+        }
         button:hover {
             background: #2a6bb5;
         }
+
+        form { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Selamat Datang Patria !</h1>
-        <p>Scan Kode QR atau Tap Kartu Patria anda !</p>
+    @include('partials.navbar')
+    <div class="main-container">
+        <div class="container">
+            <h1>Selamat Datang Patria!</h1>
+            <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
 
-        <button id="permission-button">Request Camera Permission</button>
+            <button id="permission-button">Request Camera Permission</button>
 
-        <div id="scanner-container"></div>
+            <div id="scanner-container"></div>
 
-        <form id="searchForm" method="GET">
-            <input type="number" id="userId" name="userId" placeholder="Enter Patria ID or Card ID" required>
-            <button type="submit">Search</button>
-        </form>
-
+            <form id="searchForm" method="GET">
+                <input type="text" id="userId" name="userId" placeholder="Enter Patria ID or Card ID" required>
+                <button class="btnSubmit" type="submit">Search</button>
+            </form>
+        </div>
     </div>
+    <!-- Main Content -->
+   
 
     <script>
         document.getElementById("permission-button").addEventListener("click", function () {
@@ -118,7 +148,7 @@
                         localStorage.setItem("cameraPermissionGranted", "true");
 
                         // Stop the stream after permission check
-                        stream.getTracks().forEach((track) => track.stop()); 
+                        stream.getTracks().forEach((track) => track.stop());
 
                         // Display scanner and hide the button
                         document.getElementById("scanner-container").style.display = "block";
@@ -131,7 +161,7 @@
 
                         html5QrcodeScanner.render(onScanSuccess);
 
-                        // Fully remove the stop scanning button after rendering
+                        // Remove the stop scanning button after rendering
                         const stopButton = document.querySelector(".html5-qrcode-button-stop");
                         if (stopButton) {
                             stopButton.parentElement.removeChild(stopButton);
@@ -153,13 +183,14 @@
 
                 html5QrcodeScanner.render(onScanSuccess);
 
-                // Fully remove the stop scanning button after rendering
+                // Remove the stop scanning button after rendering
                 const stopButton = document.querySelector(".html5-qrcode-button-stop");
                 if (stopButton) {
                     stopButton.parentElement.removeChild(stopButton);
                 }
             }
         });
+
         let lastOpenedTime = 0; // Store the last time the window was opened
 
         function onScanSuccess(qrCodeMessage) {
@@ -178,12 +209,6 @@
             }
         }
 
-
-
-    </script>
-
-
-    <script>
         document.getElementById('searchForm').addEventListener('submit', function (event) {
             event.preventDefault();  // Prevent the default form submission
 
@@ -194,5 +219,6 @@
             window.open(url, '_blank');
         });
     </script>
+
 </body>
 </html>
