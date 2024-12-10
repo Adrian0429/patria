@@ -1,0 +1,59 @@
+﻿user_id,card_id,nama_lengkap,jenis_kelamin,tanggal_lahir,golongan_darah,vihara,image_link,role,email,password
+3102240010,NULL,Cindy Sandra ,Perempuan,5/15/1999,B,Vihara Metta Palmerah,,user,cindy@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102240014,NULL,Natalia ,Perempuan,12/24/1992,A,Vihara Metta Palmerah,,user,natalia@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3605240001,NULL,Celvin Cornerio Virya Putra,Laki-Laki,11/8/2003,B+,Vihara Isipatana,,user,celvin@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601230002,NULL,Alvin ,Laki-Laki,2/13/1993,B,Vihara Indraloka,,user,alvin@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102240017,NULL,Ferdian Suciokto,Laki-Laki,2/11/1998,B,Vihara Metta Palmerah, Vihara Saddhapala, Vihara Ratana Graha,,user,ferdian@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+1201180013,NULL,Harianto ,Laki-Laki,7/12/1996,A+,Vihara Mahasampatti Medan,,user,harianto@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3605180007,NULL,Alvin Prayitna,Laki-Laki,6/25/1999,AB,Vihara Isipatana,,user,alvin@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101230015,NULL,Yos Valiandy,Laki-Laki,12/3/1998,B,Vihara Jakarta Dhammacakka Jaya,,user,yos@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101230012,NULL,Thalia Gracella,Perempuan,7/27/2004,AB,Vihara Jakarta Dhammacakka Jaya,,user,thalia@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102190003,NULL,Johan Tanuwijaya,Laki-Laki,6/13/1992,AB,Vihara Metta Palmerah,,user,johan@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102190008,NULL,Reynaldo ,Laki-Laki,10/7/1997,B,Vihara Metta Palmerah, Vihara Ratana Graha,,user,reynaldo@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102190004,NULL,Evelyn Viriya,Perempuan,8/22/2001,O,Vihara Saddhapala,,user,evelyn@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102240013,NULL,Rio Jondruk,Laki-Laki,3/9/1997,A,Vihara Metta Palmerah, Vihara Ratana Graha, Vihara Jakarta Dhammacakka Jaya,,user,rio@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102240012,NULL,Monica ,Perempuan,5/28/2001,B,Vihara Metta Palmerah, Vihara Saddhapala, Vihara Ratana Graha,,user,monica@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102190009,NULL,Irenna ,Perempuan,9/30/2002,O,Vihara Metta Palmerah,,user,irenna@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102240016,NULL,Albert Kirana Sutiono,Laki-Laki,7/22/1994,A,Vihara Ratana Graha, Vihara Dharma Ratna,,user,albert@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601230001,NULL,Algi Lastiawan,Laki-Laki,7/19/2003,O,Vihara Tri Maha Dharma,,user,algi@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601240034,NULL,Kelvin ,Laki-Laki,8/25/2003,O+,Vihara Indraloka,,user,kelvin@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601240032,NULL,Willy Chandra,Laki-Laki,3/27/1995,O,Vihara Padumuttara,,user,willy@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3605240003,NULL,Chintya Ouwren Adhisetto,Perempuan,12/11/2004,O,Vihara Tri Maha Ratna,,user,chintya@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601240018,NULL,Erico Honovi Pui,Laki-Laki,11/28/2002,O,Vihara Buddhi Vardhana,,user,erico@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3605240002,NULL,Joice Ananda,Perempuan,7/3/2003,O,Vihara Buddhi Vardhana,,user,joice@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3605240004,NULL,Jonathan Lie,Laki-Laki,5/15/2002,AB,Vihara Isipatana,,user,jonathan@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601240033,NULL,Yuliana Agustina,Perempuan,8/13/2008,O,Vihara Padumuttara,,user,yuliana@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601240015,NULL,Mutiara Mudita,Perempuan,11/5/1999,B,Vihara Sasana Subhasita,,user,mutiara@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3602240001,NULL,Cecilia Clareta,Perempuan,8/10/2003,O,Vihara Caga Sasana,,user,cecilia@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3603230002,NULL,Geraldi ,Laki-Laki,8/10/2002,A,Vihara Siripada,,user,geraldi@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+6401230001,NULL,Billy Abimanyu Herlianto,Laki-Laki,11/2/2004,O,Vihara Muladharma Samarinda,,user,billy@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+6401230020,NULL,Sindra Telianto,Laki-Laki,9/15/2004,B,Vihara Muladharma Samarinda,,user,sindra@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102190013,NULL,Florencia Irena Gunawan,Perempuan,7/18/1997,O,Vihara Metta Palmerah, Vihara Saddhapala, Vihara Ratana Graha,,user,florencia@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102240006,NULL,Yosi Monitasari,Perempuan,11/30/1998,O+,Vihara Hemadhiro Mettavati,,user,yosi@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102240015,NULL,Paramitta Sari,Perempuan,12/25/1998,B,Vihara Metta Palmerah, Vihara Saddhapala, Vihara Ratana Graha,,user,paramitta@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601170009,NULL,Sudarmadi ,Laki-Laki,5/8/1988,A,Vihara Indraloka,,DPP,sudarmadi@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102170002,NULL,Denny ,Laki-Laki,12/27/1991,O,Vihara Metta Palmerah,,DPP,denny@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3102150008,NULL,Demmy Aria Sutjipto,Laki-Laki,11/16/1983,O,Vihara Jakarta Dhammacakka Jaya,,DPP,demmy@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101160017,NULL,Marthinus Wijaya Victor,Laki-Laki,3/20/1995,O,Vihara Jakarta Dhammacakka Jaya,,DPP,marthinus@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101160023,NULL,Yuki Lavigne,Perempuan,6/15/1994,O,Vihara Theravada Buddha Sasana,,DPP,yuki@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101180002,NULL,Lydia Maheswari+C49,Perempuan,7/16/1999,O,Vihara Jakarta Dhammacakka Jaya,,DPP,lydia@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101180004,NULL,Jeni Rustan,Perempuan,6/18/1994,A,Vihara Jakarta Dhammacakka Jaya,,DPP,jeni@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101190014,NULL,Yogi Gunawaro,Laki-Laki,11/16/1992,O,Vihara Jakarta Dhammacakka Jaya,,DPP,yogi@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+5101160002,NULL,Dwi Kangge Cahya Dinata,Laki-Laki,3/24/1989,O,Vihara Buddha Sakyamuni,,DPP,dwi@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+5101180008,NULL,Krishna Satya Wiananda,Laki-Laki,10/17/1993,O,Vihara Buddha Sakyamuni,,DPP,krishna@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+5101180005,NULL,Friska Frilisia,Perempuan,8/17/1997,B,Vihara Buddha Sakyamuni,,DPP,friska@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3603180001,NULL,Pieter Prawira,Laki-Laki,4/24/2000,B,Vihara Siripada,,DPP,pieter@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601170007,NULL,Michael Kirana Sutiono,Laki-Laki,3/23/1992,A,Vihara Siripada,,DPP,michael@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601170008,NULL,Miko Marselo,Laki-Laki,11/23/1995,A,Vihara Indraloka,,DPP,miko@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601170010,NULL,Emmi Rhury Agleintan,Perempuan,8/4/1996,A,Vihara Indraloka,,DPP,emmi@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601170001,NULL,Enru Affandi,Laki-Laki,4/18/1996,B,Vihara Indraloka,,DPP,enru@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+6301150001,NULL,Lindawati Tjandera,Perempuan,7/24/1984,B,Vihara Dhammasoka,,DPP,lindawati@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+6401180027,NULL,Giovanni Siedharta,Laki-Laki,12/23/1988,O,Vihara Muladharma,,DPP,giovanni@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3101160022,NULL,Yenni Wulandari,Perempuan,1/27/1988,B,Vihara Jakarta Dhammacakka Jaya,,DPP,yenni@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3603180013,NULL,Irwan Heriyanto,Laki-Laki,1/13/1985,A,Vihara Siripada,,DPP,irwan@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+1201160002,NULL,Dresiani Mareti,Perempuan,3/27/1992,B,Vihara Mahasampatti,,DPP,dresiani@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+5103230015,NULL,Nattayavani Sonia,Perempuan,6/6/2000,O,Cetiya Buddha Manggala,,DPP,nattayavani@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3601240001,NULL,Tanry Afffandy,Laki-Laki,1/14/1992,B,Vihara Indraloka,,DPP,tanry@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+3603190007,NULL,Steven Mulia Dharma,Laki-Laki,9/17/1998,O,Pusdiklat Buddhis Sikkhadama Santibhumi,,DPP,steven@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+6401180023,NULL,Vincent Satya Surya,Laki-Laki,10/28/2001,B,Vihara Muladharma,,DPP,vincent@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
+6401240001,NULL,Edwin Satya Surya,Laki-Laki,5/17/1997,O,Vihara Ratana Graha / Vihara Muladharma,,DPP,edwin@gmail.com,$2y$12$cXRl/ynWBj8JplA9UgCAF.Y1tEOgmiM2c.PdDth0ARpzVZ1HVGoV.
