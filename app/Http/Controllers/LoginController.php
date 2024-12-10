@@ -27,7 +27,7 @@ class LoginController extends Controller
         $request->session()->invalidate(); // Invalidate the session
         $request->session()->regenerateToken(); // Regenerate CSRF token
 
-        return redirect()->route('login'); // Redirect to the login page
+        return redirect()->route('home'); // Redirect to the login page
     }
 
 }

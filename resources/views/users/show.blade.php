@@ -21,10 +21,10 @@
         .container {
             background: rgba(11, 25, 44, 0.8);
             border-radius: 16px;
-            padding: 1.5rem;
+            padding: 2rem 0;
             max-width: 55%;
             width: 100%;
-            height: 55vh;
+            height: 50vh;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
             display: flex;
             flex-direction: row;
@@ -32,11 +32,12 @@
         }
         
         .user-picture-container {
+            min-width: 25%;
             max-width:45%;
             height: 100%;
             position: relative; 
             border-radius: 12px;
-            margin: 0 2rem;
+            margin: 0 3.5rem;
         }
 
         .user-picture {
@@ -85,20 +86,24 @@
 </head>
 <body>
     <div class="container">
-        @if($user->image_link)
+        
         <div class="user-picture-container">
+            @if($user->image_link)
             <img class="user-picture" src="{{ asset('storage/' . $user->image_link) }}"/>
+            @endif
         </div>
-        @endif
+
         <div class="info">
             <h1>
                 <strong>
                     Hai, saya <br> {{ $user->nama_lengkap }} !
                 </strong>
             </h1>
+            <p><strong>Email: </strong>{{ $user->email }}</p>
             <p><strong>Jenis Kelamin:</strong> {{ $user->jenis_kelamin }}</p>
             <p><strong>Tanggal Lahir:</strong> {{ $user->tanggal_lahir }}</p>
             <p><strong>Golongan Darah:</strong> {{ $user->golongan_darah }}</p>
+
             <p><strong>Vihara:</strong> {{ $user->vihara }}</p>
             <a href="{{ url()->previous() }}" class="btn">Back</a>    </div>
     </div>
