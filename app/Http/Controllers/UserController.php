@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::where('user_id', '!=', 'admin1234')->paginate(12);
+        $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
 
         return view('users.home', compact('users'));
     }

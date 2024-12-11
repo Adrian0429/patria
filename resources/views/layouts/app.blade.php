@@ -18,6 +18,8 @@
         }
         body {
             font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            width: 100vw;
         }
     </style>
 </head>

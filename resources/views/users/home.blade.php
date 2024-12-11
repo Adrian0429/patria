@@ -1,19 +1,28 @@
 <style>
-    .main-container {
+.main-container {
     display: flex;
     flex-direction: column;
-    margin: 20px 20px;
-    }
+    height: calc(100vh - 84px);
+    box-sizing: border-box;
+    padding: 0 20px 20px 20px;
+}
+
+.table-responsive {
+    height: calc(100vh - 84px);
+    overflow-y: auto; 
+}
 
 .table {
+    flex: 1;
     width: 100%;
+    height: 80%;
     border-collapse: collapse;
     background-color: #fff;
-    text-align: left;
-    margin-top: 20px;
+    margin-bottom: 12px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
 }
 
 .table th, .table td {
@@ -25,20 +34,60 @@
 }
 
 .table th {
-    background-color: #f4f4f4;
+    position: sticky; /* Makes the header sticky */
+    top: 0; /* Stick to the top of the container */
+    background-color: #f4f4f4; /* Sticky header background */
     font-weight: bold;
     color: #333;
     text-transform: uppercase;
+    z-index: 1; /* Ensures it stays above table rows */
 }
-
-.table td:last-child {
-    min-width: 200px; /* Adjust this value to provide enough space for the buttons */
-    text-align: center;
-}
-
 
 .table tr:hover {
     background-color: #f9f9f9;
+}
+
+.pagination {
+    margin-top: 10px;
+    justify-content: center;
+    display: flex;
+    list-style: none;
+    padding-left: 0;
+}
+
+.pagination .page-item {
+    margin: 0 5px;
+}
+
+.pagination .page-link {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    text-decoration: none;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.pagination .page-link:hover {
+    background-color: #007bff;
+    color: #fff;
+    border-color: #007bff;
+    text-decoration: none;
+}
+
+.pagination .active .page-link {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.pagination .disabled .page-link {
+    color: #ccc;
+    pointer-events: none;
+    background-color: #f8f9fa;
+    border-color: #ddd;
 }
 
 
@@ -84,62 +133,9 @@
     background-color: #bd2130;
 }
 
-/* Pagination */
-.pagination {
-    margin-top: 20px;
-    justify-content: center;
-    display: flex;
-    list-style: none;
-    padding-left: 0;
-}
-
-.pagination .page-item {
-    margin: 0 5px;
-}
-
-.pagination .page-link {
-    padding: 8px 16px;
-    font-size: 0.9rem;
-    color: #007bff;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #fff;
-    text-decoration: none;
-    transition: background-color 0.3s, border-color 0.3s;
-}
-
-.pagination .page-link:hover {
-    background-color: #007bff;
-    color: #fff;
-    border-color: #007bff;
-    text-decoration: none;
-}
-
-.pagination .active .page-link {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-.pagination .disabled .page-link {
-    color: #ccc;
-    pointer-events: none;
-    background-color: #f8f9fa;
-    border-color: #ddd;
-}
-
-.pagination .page-item:first-child .page-link {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-}
-
-.pagination .page-item:last-child .page-link {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-
 .btn-add-user {
     display: inline-block;
+    margin: 10px 0;
     padding: 10px 20px;
     font-size: 1rem;
     font-weight: bold;
@@ -154,7 +150,7 @@
 
 .btn-add-user:hover {
     background-color: #0056b3;
-    transform: translateY(-2px); /* Slight lift effect on hover */
+    transform: translateY(-2px); 
 }
 
 .btn-add-user:focus {
@@ -162,10 +158,17 @@
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Focus ring */
 }
 
+.table td:last-child {
+    min-width: 200px; /* Adjust this value to provide enough space for the buttons */
+    text-align: center;
+}
+
+
+
 </style>
 @extends('layouts.app')
 @section('content')
-    <div class="main-container">
+<div class="main-container">
         <!-- Add button to redirect to the create user page -->
         <a href="{{ route('users.create') }}" class="btn-add-user">Tambahkan Anggota</a>
         

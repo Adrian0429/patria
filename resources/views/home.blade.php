@@ -24,18 +24,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 84px);
         }
 
         .container {
             text-align: center;
             background: rgba(11, 25, 44, 0.9);
-            padding: 0.5rem;
+            padding: 1rem;
             border-radius: 12px;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             max-width: 500px;
             width: 100%;
             color: white;
+            margin: 0 10px;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -44,11 +46,11 @@
             font-size: 2rem;
         }
 
-
         #scanner-container {
             margin: 0 auto;
-            width: 300px;
-            height: 300px;
+            width: 100%;
+            max-width: 200px;
+            height: 200px;
             display: flex;
             border: none !important;
             outline: none;
@@ -87,7 +89,7 @@
             margin: 10px 0;
         }
 
-        .btnSubmit{
+        .btnSubmit {
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
             font-weight: 600;
@@ -103,16 +105,67 @@
             transition: background 0.3s;
             margin: 10px 0;
         }
+
         button:hover {
             background: #2a6bb5;
         }
 
-        form { 
+        form {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                max-width: 90%;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            input {
+                max-width: 100%;
+            }
+
+            button, .btnSubmit {
+                max-width: 100%;
+                padding: 0.75rem 1rem;
+            }
+
+            #scanner-container {
+                width: 90%;
+                height: auto;
+                max-width: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                max-width: 90%;
+            }
+
+            input {
+                font-size: 0.9rem;
+            }
+
+            button, .btnSubmit {
+                font-size: 0.9rem;
+                padding: 0.75rem;
+            }
+
+            #scanner-container {
+                width: 80%;
+                height: 250px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -132,8 +185,6 @@
             </form>
         </div>
     </div>
-
-   
 
     <script>
         document.getElementById("permission-button").addEventListener("click", function () {

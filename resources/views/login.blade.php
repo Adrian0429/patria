@@ -2,11 +2,11 @@
 /* General Styling for the Login Container */
 .login-container {
     display: flex;
-    background: url('{{ asset('./bg_polos.PNG') }}') no-repeat center center;
+    background: url('{{ asset('./bg_polos.PNG') }}') no-repeat center bottom;
     background-size: cover;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: calc(100vh - 84px);
     margin: 0;
 }
 
@@ -17,6 +17,7 @@
     border-radius: 15px;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
     width: 100%;
+    margin: 24px 24px;
     max-width: 400px;
     text-align: center;
     border: 2px solid rgba(255, 255, 255, 0.2); /* Subtle border */

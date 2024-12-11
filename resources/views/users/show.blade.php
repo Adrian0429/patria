@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -12,7 +12,7 @@
             background: url('{{ asset('./bg_patria.PNG') }}') no-repeat center center;
             background-size: cover;
             color: white;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -29,20 +29,24 @@
             display: flex;
             flex-direction: row;
             align-items: center;
+            gap: 1.5rem;
         }
-        
+
         .user-picture-container {
+            flex: 1;
+            justify-content: center;
+            align-content: center;
             min-width: 25%;
-            max-width:45%;
+            max-width: 60%;
             height: 100%;
             position: relative; 
             border-radius: 12px;
-            margin: 0 3.5rem;
+            margin: 0 1.5rem;
         }
 
         .user-picture {
             width: 100%;
-            height: 100%;
+            height: auto;
             background-size: contain; 
             background-repeat: no-repeat;
             background-position: center;
@@ -50,11 +54,12 @@
         }
 
         .info {
+            flex: 2;
             text-align: start;
         }
 
         .info h1 {
-            font-size: 2.75rem;
+            font-size: 2.5rem;
             font-weight: 800;
         }
 
@@ -81,6 +86,56 @@
 
         .btn:hover {
             background: #2a6bb5;
+        }
+
+        /* Media query for smaller desktop screens */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 70%;
+                height: auto;
+                flex-direction: column;
+                padding: 2rem;
+            }
+
+            .user-picture-container {
+                max-width: 80%;
+                height: auto;
+                margin: 0 0.25rem;
+            }
+
+            .info h1 {
+                font-size: 2rem;
+            }
+
+            .info p {
+                font-size: 1rem;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+                padding: 0.6rem 1.2rem;
+            }
+        }
+
+        /* Media query for extra-small desktop screens */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 60%;
+                height: auto;
+            }
+
+            .info h1 {
+                font-size: 1.8rem;
+            }
+
+            .info p {
+                font-size: 0.9rem;
+            }
+
+            .btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
         }
     </style>
 </head>
