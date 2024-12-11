@@ -164,9 +164,77 @@
 }
 
 
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
 
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.modal .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-danger:hover {
+    background-color: #bd2130;
+}
 </style>
 @extends('layouts.app')
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h3>Confirm Deletion</h3>
+        <p>Are you sure you want to delete this user?</p>
+        <div class="modal-actions">
+            <button id="cancelButton" class="btn btn-secondary">Cancel</button>
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+        </div>
+    </div>
+</div>
 @section('content')
 <div class="main-container">
         <!-- Add button to redirect to the create user page -->
@@ -203,11 +271,8 @@
                             <td>
                                 <a href="{{ route('users.show', $user->user_id) }}" class="btn btn-info btn-sm">View</a>
                                 <a href="{{ route('users.edit', $user->user_id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <form action="{{ route('users.destroy', $user->user_id) }}" method="POST" style="display:inline-block;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
+                                <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('users.destroy', $user->user_id) }}')">Delete</a>
+
                             </td>
                         </tr>
                     @endforeach
@@ -231,4 +296,27 @@
             </ul>
         </nav>
     </div>
+    <script>
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelButton = document.getElementById('cancelButton');
+    const deleteForm = document.getElementById('deleteForm');
+
+    function openDeleteModal(actionUrl) {
+        deleteForm.setAttribute('action', actionUrl);
+        deleteModal.style.display = 'flex'; // Show the modal
+    }
+
+    cancelButton.addEventListener('click', () => {
+        deleteModal.style.display = 'none'; // Hide the modal on cancel
+    });
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        if (event.target === deleteModal) {
+            deleteModal.style.display = 'none';
+        }
+    });
+</script>
+
 @endsection
+

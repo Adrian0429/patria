@@ -132,7 +132,7 @@
                             <option value="" disabled selected>Select Role</option>
                             <option value="DPP">DPP</option>
                             <option value="DPC">DPC</option>
-                            <option value="User">Anggota</option>
+                            <option value="Anggota">Anggota</option>
                         </select>
                     </div>
                     

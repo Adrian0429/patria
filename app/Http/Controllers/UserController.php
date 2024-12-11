@@ -34,7 +34,7 @@ class UserController extends Controller
             'vihara' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:admin,DPP,DPC,user',
+            'role' => 'required|in:admin,DPP,DPC,Anggota',
             'password' => 'required|string|min:8',
         ]);
 
@@ -93,7 +93,7 @@ class UserController extends Controller
             'vihara' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg',
             'email' => 'nullable|email|unique:users,email,' . $id . ',user_id',
-            'role' => 'nullable|in:admin,DPP,DPC,user',
+            'role' => 'nullable|in:admin,DPP,DPC,Anggota',
             'password' => 'nullable|string',
         ]);
 
