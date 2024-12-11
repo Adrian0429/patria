@@ -7,7 +7,7 @@
             align-items: center;
             background: rgba(11, 25, 44, 0.9);
             color: white;
-            padding: 10px 20px;
+            padding: 10px 36px;
         }
         .navbar .logo {
             font-weight: 600;
@@ -59,9 +59,8 @@
         }
 
         .nav-logo { 
-            width: 64px;
+            width: auto;
             height: 64px;
-            margin: 0px 10px;
         }
 
         .dropdown {
@@ -128,7 +127,7 @@
 <nav class="navbar">
         <div>
                 <div class="links">
-                    <img class="nav-logo" src="./patria.png" alt="">
+                    <img class="nav-logo" src="./logo_putih.png" alt="">
                     <a style="font-size: 1.2rem;" href="/">Home</a>
                     @if (Auth::check())
                         <a style="font-size: 1.2rem;"  href="/users">Dashboard</a>

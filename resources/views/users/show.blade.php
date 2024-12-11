@@ -45,8 +45,8 @@
         }
 
         .user-picture {
-            width: 100%;
-            height: auto;
+            width: auto;
+            height: 100%;
             background-size: contain; 
             background-repeat: no-repeat;
             background-position: center;
@@ -59,13 +59,13 @@
         }
 
         .info h1 {
-            font-size: 2.5rem;
+            font-size: 2.3rem;
             font-weight: 800;
         }
 
         .info p {
             margin: 0.25rem 0;
-            font-size: 1.25rem;
+            font-size: 1rem;
         }
 
         .btn {
@@ -149,17 +149,15 @@
         </div>
 
         <div class="info">
-            <h1>
-                <strong>
-                    Hai, saya <br> {{ $user->nama_lengkap }} !
-                </strong>
-            </h1>
+            <div>
+            <h1><strong>Hai, saya <br> {{ $user->nama_lengkap }} !</strong></h1>
             <p><strong>Email: </strong>{{ $user->email }}</p>
             <p><strong>Jenis Kelamin:</strong> {{ $user->jenis_kelamin }}</p>
             <p><strong>Tanggal Lahir:</strong> {{ $user->tanggal_lahir }}</p>
             <p><strong>Golongan Darah:</strong> {{ $user->golongan_darah }}</p>
-
             <p><strong>Vihara:</strong> {{ $user->vihara }}</p>
+            </div>
+
             <a href="{{ url()->previous() }}" class="btn">Back</a>    </div>
     </div>
 </body>
