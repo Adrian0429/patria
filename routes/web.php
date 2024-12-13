@@ -41,8 +41,9 @@ Route::middleware(['auth', 'role:DPP,DPC,admin'])->group(function () {
 // Event Routes
 Route::get('/events', [EventAttendanceController::class, 'getEvents'])->name('events.index');
 Route::get('/events/create', [EventAttendanceController::class, 'createEventForm'])->name('events.createEventForm');
-Route::get('/events/{id}', [EventAttendanceController::class, 'getEvent'])->name('events.show');
+Route::get('/events/{id}', [EventAttendanceController::class, 'getEvent'])->name('events.attend');
 Route::post('/events', [EventAttendanceController::class, 'createEvent'])->name('events.create');
+Route::get('/events/{id}/edit', [EventAttendanceController::class, 'editEventForm'])->name('events.edit');
 Route::put('/events/{id}', [EventAttendanceController::class, 'updateEvent'])->name('events.update');
 Route::delete('/events/{id}', [EventAttendanceController::class, 'deleteEvent'])->name('events.delete');
 

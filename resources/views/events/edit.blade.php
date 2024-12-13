@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Event</title>
+    <title>Edit Event</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -55,43 +55,26 @@
         button:hover {
             background-color: #0056b3;
         }
-        #logo-preview {
-            margin: 1rem auto;
-            max-width: 100%;
-            max-height: 200px;
-            display: none;
-        }
     </style>
 </head>
 <body>
-    <h1>Create Event</h1>
-    <form action="{{ route('events.create') }}" method="POST" enctype="multipart/form-data">
+    <h1>Edit Event</h1>
+    <form action="{{ route('events.update', $event->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT')
         <label for="name">Event Name:</label>
-        <input type="text" name="name" id="name" placeholder="Enter Event Name" required>
+        <input type="text" name="name" id="name" value="{{ $event->name }}" required>
 
         <label for="logo">Event Logo:</label>
-        <input type="file" name="logo" id="logo" accept="image/*" onchange="previewLogo(event)">
-        <img id="logo-preview" src="#" alt="Logo Preview">
+        <input type="file" name="logo" id="logo">
 
         <label for="start_date">Start Date:</label>
-        <input type="date" name="start_date" id="start_date" required>
+        <input type="date" name="start_date" id="start_date" value="{{ $event->start_date }}" required>
 
         <label for="end_date">End Date:</label>
-        <input type="date" name="end_date" id="end_date" required>
+        <input type="date" name="end_date" id="end_date" value="{{ $event->end_date }}" required>
 
-        <button type="submit">Save Event</button>
+        <button type="submit">Update Event</button>
     </form>
-
-    <script>
-        function previewLogo(event) {
-            const [file] = event.target.files;
-            if (file) {
-                const preview = document.getElementById('logo-preview');
-                preview.src = URL.createObjectURL(file);
-                preview.style.display = 'block';
-            }
-        }
-    </script>
 </body>
 </html>

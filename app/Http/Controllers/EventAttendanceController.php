@@ -11,18 +11,25 @@ use App\Exports\AttendancesExport;
 
 class EventAttendanceController extends Controller
 {
-    // Show a form to create a new event
+
+
+    public function getEvents()
+    {
+        $events = Event::paginate(5);
+        return view('events.index', compact('events'));
+    }
+
     public function createEventForm()
     {
         return view('events.create');
     }
 
-    // Handle creating a new event
     public function createEvent(Request $request)
-    {
+    {   
+
         $validator = Validator::make($request->all(), [
-            'event_name' => 'required|string|max:255',
-            'event_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'name' => 'required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
@@ -31,28 +38,23 @@ class EventAttendanceController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $data = $request->only('event_name', 'start_date', 'end_date');
-        if ($request->hasFile('event_logo')) {
-            $data['event_logo'] = $request->file('event_logo')->store('event_logos');
+        $data = $request->only('name', 'start_date', 'end_date');
+
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('logo', 'public');
         }
 
         Event::create($data);
 
+        // Redirect with a success message
         return redirect()->route('events.index')->with('success', 'Event created successfully!');
-    }
-
-    // Show a list of events
-    public function getEvents()
-    {
-        $events = Event::all();
-        return view('events.index', compact('events'));
     }
 
     // Show details of a specific event
     public function getEvent($id)
     {
         $event = Event::findOrFail($id);
-        return view('events.show', compact('event'));
+        return view('events.attend', compact('event'));
     }
 
     // Show a form to edit an event
@@ -68,8 +70,8 @@ class EventAttendanceController extends Controller
         $event = Event::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'event_name' => 'sometimes|required|string|max:255',
-            'event_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'name' => 'sometimes|required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
             'start_date' => 'sometimes|required|date',
             'end_date' => 'sometimes|required|date|after_or_equal:start_date',
         ]);
@@ -78,17 +80,16 @@ class EventAttendanceController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $data = $request->only('event_name', 'start_date', 'end_date');
-        if ($request->hasFile('event_logo')) {
-            $data['event_logo'] = $request->file('event_logo')->store('event_logos');
+        $data = $request->only('name', 'start_date', 'end_date');
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('logo', 'public');
         }
 
         $event->update($data);
 
-        return redirect()->route('events.show', $id)->with('success', 'Event updated successfully!');
+        return redirect()->route('events.index', $id)->with('success', 'Event updated successfully!');
     }
 
-    // Handle deleting an event
     public function deleteEvent($id)
     {
         $event = Event::findOrFail($id);
@@ -97,14 +98,12 @@ class EventAttendanceController extends Controller
         return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
     }
     
-    // Show a form to record attendance
     public function recordAttendanceForm($event_id)
     {
         $event = Event::findOrFail($event_id);
         return view('attendance.record', compact('event'));
     }
 
-    // Handle recording attendance
     public function recordAttendance(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -142,7 +141,6 @@ class EventAttendanceController extends Controller
         return redirect()->route('events.show', $request->event_id)->with('success', 'Attendance recorded successfully!');
     }
 
-    // Download attendance as Excel
     public function downloadAttendance($event_id)
     {
         $event = Event::findOrFail($event_id);

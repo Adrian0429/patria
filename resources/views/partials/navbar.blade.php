@@ -1,5 +1,4 @@
 <style>
-    /* Navbar Styles */
         .navbar {
             display: flex;
             height: 64px;

@@ -62,7 +62,7 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center text-primary font-bold">Edit Anggota</h1>
-        @if(Auth::user()->jabatan == 'admin')
+        @if(Auth::user()->role == 'admin')
         <a href="{{ route('users.home') }}" class="btn-add-user">Daftar Anggota</a>
         @else
         <a href="{{ route('home') }}" class="btn-add-user">Kembali</a>  
@@ -72,7 +72,7 @@
             <form action="{{ route('users.update', $user->user_id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
-                @if (Auth::user()->jabatan == 'admin')
+                @if (Auth::user()->role == 'admin')
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="card_id" class="form-label">Card ID</label>
