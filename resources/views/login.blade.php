@@ -2,7 +2,7 @@
 /* General Styling for the Login Container */
 .login-container {
     display: flex;
-    background: url('{{ asset('./bg_polos.PNG') }}') no-repeat center bottom;
+    background: url('{{ asset('./bg_revised.PNG') }}') no-repeat center center;
     background-size: cover;
     justify-content: center;
     align-items: center;

@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: url('{{ asset('./bg_polos.PNG') }}') no-repeat center bottom;
+            background: url('{{ asset('./bg_revised.PNG') }}') no-repeat center center;
             background-size: cover;
             margin: 0;
             padding: 0;
@@ -168,8 +168,8 @@
         }
     </style>
 </head>
-<body>
     @include('partials.navbar')
+<body>
     <div class="main-container">
         <div class="container">
             <h1>Selamat Datang Patria!</h1>
