@@ -9,7 +9,7 @@
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
-            background: url('{{ asset('./bg_patria.PNG') }}') no-repeat center center;
+            background: url('{{ asset('./bg_revised.png') }}') no-repeat center center;
             background-size: cover;
             color: white;
             height: 100vh;
