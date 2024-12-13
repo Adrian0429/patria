@@ -62,13 +62,18 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center text-primary font-bold">Edit Anggota</h1>
+        @if(Auth::user()->jabatan == 'admin')
         <a href="{{ route('users.home') }}" class="btn-add-user">Daftar Anggota</a>
+        @else
+        <a href="{{ route('home') }}" class="btn-add-user">Kembali</a>  
+        @endif
+
         <div class="card p-4">
             <form action="{{ route('users.update', $user->user_id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
+                @if (Auth::user()->jabatan == 'admin')
                 <div class="row">
-                    
                     <div class="col-md-6 mb-3">
                         <label for="card_id" class="form-label">Card ID</label>
                         <input type="text" class="form-control" id="card_id" name="card_id" value="{{ $user->card_id }}">
@@ -79,8 +84,9 @@
                         <input type="text" class="form-control" id="user_id" name="user_id" value="{{ $user->user_id }}">
                     </div>
                 </div>
+                @endif
+
                 <div class="row">
-                    
                     <div class="col-md-6 mb-3">
                         <label for="nama_lengkap" class="form-label">Nama Lengkap</label>
                         <input type="text" class="form-control" id="nama_lengkap" name="nama_lengkap" value="{{ $user->nama_lengkap }}">
@@ -125,7 +131,7 @@
                     </div>
                 </div>
                 <div class="row">
-                   
+                    @if (Auth::user()->jabatan == 'admin')
                     <div class="col-md-6 mb-3">
                         <label for="role" class="form-label">Jabatan</label>
                         <select class="form-select" id="role" name="role">
@@ -135,22 +141,24 @@
                             <option value="User" {{ $user->jabatan == 'User' ? 'selected' : '' }}>Anggota</option>
                         </select>
                     </div>
-                    
+                    @endif
+
+                    <div class="mb-3 col-md-6 ">
+                        <label for="image" class="form-label">Profile Image</label>
+                        <input type="file" class="form-control" id="image" name="image">
+                        @if($user->image_link)
+                        <p class="mt-3">Current Image:</p>
+                        <img class="rounded-2" src="{{ asset('storage/' . $user->image_link) }}" alt="Profile Image" width="150">
+                        @endif
+                    </div>
+                
                     <div class="col-md-6 mb-3">
                         <label for="vihara" class="form-label">Vihara</label>
                         <input type="text" class="form-control" id="vihara" name="vihara" value="{{ $user->vihara }}">
                     </div>
                 </div>
                 
-                <div class="mb-3">
-                    <label for="image" class="form-label">Profile Image</label>
-                    <input type="file" class="form-control" id="image" name="image">
-                    @if($user->image_link)
-                    <p class="mt-3">Current Image:</p>
-                    <img class="rounded-2" src="{{ asset('storage/' . $user->image_link) }}" alt="Profile Image" width="150">
-                @endif
-                </div>
-                
+
                 <button type="submit" class="btn btn-primary w-100">Save</button>
             </form>
         </div>

@@ -9,7 +9,7 @@
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
-            background: url('{{ asset('./bg_patria.PNG') }}') no-repeat center bottom;
+            background: url('{{ asset('./bg_patria.PNG') }}') no-repeat center center;
             background-size: cover;
             color: white;
             height: 100vh;
@@ -158,7 +158,15 @@
             <p><strong>Vihara:</strong> {{ $user->vihara }}</p>
             </div>
 
-            <a href="{{ url()->previous() }}" class="btn">Back</a>    </div>
+            <div>
+                @if (Auth::check() && Auth::user()->user_id == $user->user_id)
+                <a href="{{ route('users.edit', $user->user_id) }}" class="btn" style="margin-right: 8px;">Edit Profile</a>
+                @endif
+                <a href="/" class="btn">Kembali</a>  
+                
+            </div>
+            
+        </div>
     </div>
 </body>
 </html>

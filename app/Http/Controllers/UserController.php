@@ -7,14 +7,36 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     public function index()
     {
-        $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
+        if(auth()->user()->role == 'admin') {
+            $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
+        }
+        else if(auth()->user()->role == 'DPP') {
+            $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
+        } else if(auth()->user()->role == 'DPC') {
+            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->paginate(10);
+        } else {
+            return view('users.profile');
+        }
 
         return view('users.home', compact('users'));
+    }
+
+    public function profile()
+    {   
+        if (!auth()->check() || auth()->user()->user_id === null) {
+            return redirect()->route('login');
+        }
+
+        $id = auth()->user()->user_id;
+        $user = User::findOrFail($id);
+
+        return view('users.show', compact('user'));
     }
 
     public function create()
@@ -32,34 +54,39 @@ class UserController extends Controller
             'tanggal_lahir' => 'required|date',
             'golongan_darah' => 'required|string|max:3',
             'vihara' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg',
             'email' => 'required|email|unique:users,email',
             'role' => 'required|in:admin,DPP,DPC,Anggota',
             'password' => 'required|string|min:8',
         ]);
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('images', 'public');
+            $extension = $request->file('image')->getClientOriginalExtension(); // Get file extension
+            $imageName = $validatedData['user_id'] . '.' . $extension; // Use user_id as the filename
+
+            $path = $request->file('image')->storeAs('images', $imageName, 'public');
             $validatedData['image_link'] = $path;
         }
 
-        // Hash the password using bcrypt
         $validatedData['password'] = bcrypt($validatedData['password']);
 
         $user = User::create($validatedData);
 
-        // Redirect with success message
         return redirect()->route('users.home')->with('success', 'User created successfully.');
     }
 
     public function show($idOrCardId)
     {
-        // Find the user by either 'id' or 'card_id'
-        $user = User::where('user_id', $idOrCardId)
-                    ->orWhere('card_id', $idOrCardId)
-                    ->firstOrFail();
-
-        return view('users.show', compact('user'));
+        try {
+            $user = User::where('user_id', $idOrCardId)
+                        ->orWhere('card_id', $idOrCardId)
+                        ->firstOrFail();
+                        
+            return view('users.show', compact('user'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            // Redirect back with an error message
+            return redirect()->back()->with('error', 'User not found.');
+        }
     }
 
 
@@ -72,9 +99,12 @@ class UserController extends Controller
         return redirect()->route('users.show', $validatedData['userId']);
     }
 
-
     public function edit($id)
-    {
+    {   
+        if (Auth::user()->user_id != $id && Auth::user()->role == 'Anggota') {
+            return redirect()->back()->with('error', 'You do not have permission to access this page.');
+        }
+
         $user = User::findOrFail($id);
         return view('users.edit', compact('user'));
     }
@@ -98,12 +128,16 @@ class UserController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete the old image
+            // Delete the old image if it exists
             if ($user->image_link) {
                 Storage::disk('public')->delete($user->image_link);
             }
 
-            $path = $request->file('image')->store('images', 'public');
+            $extension = $request->file('image')->getClientOriginalExtension(); // Get file extension
+            $imageName = $user->user_id . '.' . $extension; // Use user_id as the filename
+
+            // Store the image in the 'images' directory with the desired name
+            $path = $request->file('image')->storeAs('images', $imageName, 'public');
             $validatedData['image_link'] = $path;
         }
 
@@ -119,7 +153,6 @@ class UserController extends Controller
 
         return redirect()->route('users.home')->with('success', 'User updated successfully.');
     }
-
 
     public function destroy($id)
     {

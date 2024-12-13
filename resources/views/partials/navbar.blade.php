@@ -87,7 +87,7 @@
             display: none;
             position: absolute;
             top: 100%; /* Position below the button */
-            left: 0;
+            right: 0;
             padding: 1rem;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -95,6 +95,7 @@
             overflow: hidden;
             z-index: 1000;
             min-width: 160px;
+            
         }
 
         .dropdown-menu .dropdown-item {
@@ -123,13 +124,33 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
+
+        .button-profile{
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            padding: 10px 64px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        a { 
+            text-decoration: none;
+            color: white;
+        }
+
+
+
 </style>
 <nav class="navbar">
         <div>
                 <div class="links">
                     <img class="nav-logo" src="./logo_putih.png" alt="">
                     <a style="font-size: 1.2rem;" href="/">Home</a>
-                    @if (Auth::check())
+                    @if (Auth::check() && Auth::User()->role != 'Anggota')
                         <a style="font-size: 1.2rem;"  href="/users">Dashboard</a>
                     @endif
                     
@@ -139,6 +160,8 @@
             <div class="dropdown">
                 <button class="dropdown-button">{{ Auth::User()->nama_lengkap }}</button>
                 <div class="dropdown-menu">
+                    <button class="button-profile"><a href="{{ route('profile') }}" >Profile</a></button>
+                   
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button class="button-logout" type="submit">Logout</button>

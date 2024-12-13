@@ -17,7 +17,7 @@ class CreateUsersTable extends Migration
             $table->string('golongan_darah');
             $table->string('vihara');
             $table->string('image_link')->nullable();
-            $table->enum('role', ['admin', 'DPP', 'DPC', 'user'])->default('user');
+            $table->enum('role', ['admin', 'DPP', 'DPC', 'Anggota'])->default('Anggota');
             $table->string('email')->unique();
             $table->string('password');
             $table->timestamps();
