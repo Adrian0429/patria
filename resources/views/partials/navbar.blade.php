@@ -5,7 +5,7 @@
             height: 64px;
             justify-content: space-between;
             align-items: center;
-            background: rgba(11, 25, 44, 0.9);
+            background: rgba(11, 25, 44);
             color: white;
             padding: 10px 36px;
         }
@@ -142,8 +142,6 @@
             color: white;
         }
 
-
-
 </style>
 <nav class="navbar">
         <div>
@@ -153,7 +151,6 @@
                     @if (Auth::check() && Auth::User()->role != 'Anggota')
                         <a style="font-size: 1.2rem;"  href="/users">Dashboard</a>
                     @endif
-                    
                 </div>
         </div>
             @if (Auth::check())

@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: url('{{ asset('./bg_revised.png') }}') no-repeat center center;
+            background: url('{{ asset('./bg_revised.png') }}') no-repeat center bottom;
             background-size: cover;
             margin: 0;
             padding: 0;
@@ -30,7 +30,7 @@
         .container {
             text-align: center;
             background: rgba(11, 25, 44, 0.9);
-            padding: 1rem;
+            padding: 0.75rem;
             border-radius: 12px;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             max-width: 500px;
@@ -49,8 +49,8 @@
         #scanner-container {
             margin: 0 auto;
             width: 100%;
-            max-width: 200px;
-            height: 200px;
+            max-width: 170px;
+            height: 170px;
             display: flex;
             border: none !important;
             outline: none;

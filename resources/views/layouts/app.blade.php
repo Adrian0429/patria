@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,19 +11,23 @@
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <style>
+
         * {
             margin: 0;
             padding: 0;
         }
+
         body {
             font-family: 'Poppins', sans-serif;
             height: 100vh;
             width: 100vw;
         }
+        
     </style>
 </head>
-<body>
         @include('partials.navbar')
+<body>
+
         @yield('content')
         
 </body>
