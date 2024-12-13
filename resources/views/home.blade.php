@@ -12,7 +12,7 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            background: url('{{ asset('./bg_revised.png') }}') no-repeat center bottom;
+            background: url('{{ asset('./bg_main.png') }}') no-repeat center bottom;
             background-size: cover;
             margin: 0;
             padding: 0;
