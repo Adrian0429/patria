@@ -151,11 +151,16 @@
         <div class="info">
             <div>
             <h1><strong>Hai, saya <br> {{ $user->nama_lengkap }} !</strong></h1>
-            <p><strong>Email: </strong>{{ $user->email }}</p>
+            {{-- <p><strong>Email: </strong>{{ $user->email }}</p>
             <p><strong>Jenis Kelamin:</strong> {{ $user->jenis_kelamin }}</p>
             <p><strong>Tanggal Lahir:</strong> {{ $user->tanggal_lahir }}</p>
             <p><strong>Golongan Darah:</strong> {{ $user->golongan_darah }}</p>
-            <p><strong>Vihara:</strong> {{ $user->vihara }}</p>
+            <p><strong>Vihara:</strong> {{ $user->vihara }}</p> --}}
+            <p><strong>Email: </strong>******</p>
+            <p><strong>Jenis Kelamin: </strong>******</</p>
+            <p><strong>Tanggal Lahir: </strong>******</</p>
+            <p><strong>Golongan Darah: </strong>******</</p>
+            <p><strong>Vihara: </strong>******</</p>
             </div>
 
             <div>
