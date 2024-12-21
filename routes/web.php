@@ -47,8 +47,6 @@ Route::get('/events/{id}/edit', [EventAttendanceController::class, 'editEventFor
 Route::put('/events/{id}', [EventAttendanceController::class, 'updateEvent'])->name('events.update');
 Route::delete('/events/{id}', [EventAttendanceController::class, 'deleteEvent'])->name('events.delete');
 
-// Attendance Routes
-Route::get('/attendance', [EventAttendanceController::class, 'recordAttendanceForm'])->name('attendance.index');
 Route::post('/attendance', [EventAttendanceController::class, 'recordAttendance'])->name('attendance.record');
 Route::get('/attendance/{event_id}', [EventAttendanceController::class, 'getAttendance'])->name('attendance.index');
 Route::delete('/attendance/{id}', [EventAttendanceController::class, 'deleteAttendance'])->name('attendance.delete');

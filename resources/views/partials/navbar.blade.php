@@ -148,7 +148,8 @@
                     <img class="nav-logo" src="./logo_putih.png" alt="">
                     <a style="font-size: 1.2rem;" href="/">Home</a>
                     @if (Auth::check() && Auth::User()->role != 'Anggota')
-                        <a style="font-size: 1.2rem;"  href="/users">Dashboard</a>
+                        <a style="font-size: 1.2rem;"  href="/users">Anggota</a>
+                        <a style="font-size: 1.2rem;"  href="/events">Event</a>
                     @endif
                 </div>
         </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Attendance;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -50,21 +51,18 @@ class EventAttendanceController extends Controller
         return redirect()->route('events.index')->with('success', 'Event created successfully!');
     }
 
-    // Show details of a specific event
     public function getEvent($id)
     {
         $event = Event::findOrFail($id);
         return view('events.attend', compact('event'));
     }
 
-    // Show a form to edit an event
     public function editEventForm($id)
     {
         $event = Event::findOrFail($id);
         return view('events.edit', compact('event'));
     }
 
-    // Handle updating an event
     public function updateEvent(Request $request, $id)
     {
         $event = Event::findOrFail($id);
@@ -98,25 +96,31 @@ class EventAttendanceController extends Controller
         return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
     }
     
-    public function recordAttendanceForm($event_id)
-    {
-        $event = Event::findOrFail($event_id);
-        return view('attendance.record', compact('event'));
-    }
-
     public function recordAttendance(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'event_id' => 'required|exists:events,id',
-            'user_id' => 'required|exists:users,id',
+            'event_id' => 'required',
+            'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back()
+                ->withErrors($validator)
+                ->with('error', 'Validation failed! Please provide all required inputs.')
+                ->withInput();
         }
 
         $event = Event::find($request->event_id);
+        $user = User::find($request->user_id);
         $today = now()->toDateString();
+
+        if (!$event) {
+            return redirect()->back()->with('error', 'Event not found.');
+        }
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
+        }
 
         if ($event->start_date > $today || $event->end_date < $today) {
             return redirect()->back()->with('error', 'Attendance is not allowed outside the event dates.');
@@ -132,13 +136,18 @@ class EventAttendanceController extends Controller
             return redirect()->back()->with('error', 'User already attended this event today.');
         }
 
-        Attendance::create([
-            'event_id' => $request->event_id,
-            'user_id' => $request->user_id,
-            'attendance_date' => $today,
-        ]);
+        try {
+            Attendance::create([
+                'event_id' => $request->event_id,
+                'user_id' => $request->user_id,
+                'attendance_date' => $today,
+            ]);
 
-        return redirect()->route('events.show', $request->event_id)->with('success', 'Attendance recorded successfully!');
+            return redirect()->route('events.attend', $request->event_id)
+                ->with('success', 'Attendance recorded successfully!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to record attendance. Please try again.');
+        }
     }
 
     public function downloadAttendance($event_id)
@@ -147,16 +156,25 @@ class EventAttendanceController extends Controller
         return Excel::download(new AttendancesExport($event_id), "attendance_{$event->event_name}.xlsx");
     }
 
-    // Show attendance records for an event
     public function getAttendance($event_id)
     {
-        $event = Event::findOrFail($event_id);
-        $attendances = Attendance::where('event_id', $event_id)->get();
+        $attendances = Attendance::join('users', 'attendances.user_id', '=', 'users.user_id') // Join users table
+            ->join('events', 'attendances.event_id', '=', 'events.id') // Join events table
+            ->where('attendances.event_id', $event_id)
+            ->select(
+                'attendances.*', 
+                'users.nama_lengkap as nama_lengkap', 
+                'users.email as user_email', 
+                'events.name as event_name', 
+                'events.logo as event_logo'
+            ) // Select fields
+            ->orderBy('attendances.attendance_date', 'desc')
+            ->get();
 
-        return view('attendance.index', compact('event', 'attendances'));
+        // dd($attendances);
+        return view('attendance.index', compact('attendances'));
     }
 
-    // Handle deleting attendance record
     public function deleteAttendance($id)
     {
         $attendance = Attendance::findOrFail($id);

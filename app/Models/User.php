@@ -29,5 +29,10 @@ class User extends Authenticatable // Change from Model to Authenticatable
         'role',
     ];
 
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
     // Add any additional methods related to authentication if necessary
 }

@@ -94,9 +94,10 @@
 /* Buttons */
 .btn {
     padding: 6px 12px;
-    font-size: 0.9rem;
+    font-size: 1rem;
     border-radius: 6px;
     text-decoration: none;
+    min-width: 110px;
     color: #fff;
 }
 
@@ -159,8 +160,13 @@
 }
 
 .table td:last-child {
-    min-width: 200px; /* Adjust this value to provide enough space for the buttons */
-    text-align: center;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center; /* Center buttons vertically */
+    align-items: center; /* Center buttons horizontally */
+    gap: 8px; /* Add spacing between buttons */
+    min-width: 150px; /* Ensure enough space for the buttons */
 }
 
 
@@ -262,7 +268,8 @@
                             <td>{{ $event->start_date }}</td>
                             <td>{{ $event->end_date }}</td>
                             <td>
-                                <a href="{{ route('events.attend', $event->id) }}" class="btn btn-info btn-sm">View</a>
+                                <a href="{{ route('events.attend', $event->id) }}" class="btn btn-info btn-sm">Absen</a>
+                                <a href="{{ route('attendance.index', $event->id) }}" class="btn btn-info btn-sm">Daftar Absen</a>
                                 <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('events.delete', $event->id) }}')">Delete</a>
                             </td>

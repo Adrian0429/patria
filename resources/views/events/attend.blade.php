@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <title>Patria Management</title>
 
@@ -175,100 +177,42 @@
             <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
 
             <button id="permission-button">Request Camera Permission</button>
-
             <div id="scanner-container"></div>
-
-            <form id="searchForm" method="GET">
-                <input type="text" id="userId" name="userId" placeholder="Enter Patria ID or Card ID" required>
-                <button class="btnSubmit" type="submit">Search</button>
+            <form id="searchForm" method="POST" action="{{ route('attendance.record') }}">
+                @csrf
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
+                <input type="text" id="userId" name="user_id" placeholder="Enter Patria ID or Card ID" required>
+                <button class="btnSubmit" type="submit">Submit Attendance</button>
             </form>
         </div>
     </div>
-
+    @if (session('error'))
     <script>
-        document.getElementById("permission-button").addEventListener("click", function () {
-            // Check if camera permission has already been granted
-            if (!localStorage.getItem("cameraPermissionGranted")) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then((stream) => {
-                        console.log("Camera permission granted!");
-                        alert("Camera permission granted. You can now start scanning.");
-                        
-                        // Save the camera permission state in localStorage
-                        localStorage.setItem("cameraPermissionGranted", "true");
-
-                        // Stop the stream after permission check
-                        stream.getTracks().forEach((track) => track.stop());
-
-                        // Display scanner and hide the button
-                        document.getElementById("scanner-container").style.display = "block";
-                        document.getElementById("permission-button").style.display = "none";
-
-                        // Initialize QR Code Scanner
-                        const html5QrcodeScanner = new Html5QrcodeScanner(
-                            "scanner-container", { fps: 10, qrbox: 250 }, false
-                        );
-
-                        html5QrcodeScanner.render(onScanSuccess);
-
-                        // Remove the stop scanning button after rendering
-                        const stopButton = document.querySelector(".html5-qrcode-button-stop");
-                        if (stopButton) {
-                            stopButton.parentElement.removeChild(stopButton);
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Camera permission error:", err);
-                        alert("Camera permission denied. Please enable camera access in your browser settings.");
-                    });
-            } else {
-                // If permission is already granted, just show the scanner
-                document.getElementById("scanner-container").style.display = "block";
-                document.getElementById("permission-button").style.display = "none";
-
-                // Initialize QR Code Scanner
-                const html5QrcodeScanner = new Html5QrcodeScanner(
-                    "scanner-container", { fps: 10, qrbox: 250 }, false
-                );
-
-                html5QrcodeScanner.render(onScanSuccess);
-
-                // Remove the stop scanning button after rendering
-                const stopButton = document.querySelector(".html5-qrcode-button-stop");
-                if (stopButton) {
-                    stopButton.parentElement.removeChild(stopButton);
-                }
-            }
-        });
-
-        let lastOpenedTime = 0; // Store the last time the window was opened
-
-        function onScanSuccess(qrCodeMessage) {
-            const currentTime = new Date().getTime();
-            
-            // Only open a new window if 500ms have passed since the last one
-            if (currentTime - lastOpenedTime >= 500) {
-                console.log("Scanned QR Code:", qrCodeMessage);
-                var url = '/users/' + qrCodeMessage;
-                window.open(url, '_blank');
-                
-                // Update the last opened time to the current time
-                lastOpenedTime = currentTime;
-            } else {
-                console.log("Window opening too soon. Please wait 0.5 seconds.");
-            }
-        }
-
-        document.getElementById('searchForm').addEventListener('submit', function (event) {
-            event.preventDefault();  // Prevent the default form submission
-
-            var userId = document.getElementById('userId').value;
-
-            var url = '/users/' + userId;
-
-            window.open(url, '_blank');
-        });
+        Toastify({
+            text: "{{ session('error') }}",
+            backgroundColor: "#ff5f6d",
+            duration: 3000,
+            close: true,
+            gravity: "top", 
+            position: "right",
+            stopOnFocus: true 
+        }).showToast();
     </script>
+    @endif
+
+    @if (session('success'))
+        <script>
+            Toastify({
+                text: "{{ session('success') }}",
+                backgroundColor: "#28a745",
+                duration: 3000,
+                close: true,
+                gravity: "top", 
+                position: "right",
+                stopOnFocus: true 
+            }).showToast();
+        </script>
+    @endif
 
 </body>
 </html>
