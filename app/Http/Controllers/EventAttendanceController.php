@@ -150,14 +150,10 @@ class EventAttendanceController extends Controller
         }
     }
 
-    public function downloadAttendance($event_id)
-    {
-        $event = Event::findOrFail($event_id);
-        return Excel::download(new AttendancesExport($event_id), "attendance_{$event->event_name}.xlsx");
-    }
 
     public function getAttendance($event_id)
     {
+        $event = Event::findOrFail($event_id);
         $attendances = Attendance::join('users', 'attendances.user_id', '=', 'users.user_id') // Join users table
             ->join('events', 'attendances.event_id', '=', 'events.id') // Join events table
             ->where('attendances.event_id', $event_id)
@@ -167,13 +163,65 @@ class EventAttendanceController extends Controller
                 'users.email as user_email', 
                 'events.name as event_name', 
                 'events.logo as event_logo'
-            ) // Select fields
-            ->orderBy('attendances.attendance_date', 'desc')
+            ) 
+            ->orderBy('attendances.created_at', 'asc')
+            ->paginate(15);
+
+        return view('attendance.index', compact('attendances', 'event'));
+    }
+
+
+    public function downloadAttendanceCSV($event_id)
+    {
+        $event = Event::findOrFail($event_id);
+
+        $attendances = Attendance::join('users', 'attendances.user_id', '=', 'users.user_id') // Join users table
+            ->where('attendances.event_id', $event_id)
+            ->select(
+                'attendances.id as attendance_id',
+                'users.user_id',
+                'users.nama_lengkap as nama_lengkap',
+                'users.email as user_email',
+                'attendances.created_at as attendance_date'
+            ) 
+            ->orderBy('attendances.created_at', 'asc')
             ->get();
 
-        // dd($attendances);
-        return view('attendance.index', compact('attendances'));
+            // dd($attendances);
+        $csvHeaders = [
+            'Attendance ID',
+            'User ID',
+            'Full Name',
+            'Email',
+            'Attendance Date',
+        ];
+
+        $fileName = "absensi_event_{$event->name}.csv";
+
+        $callback = function () use ($attendances, $csvHeaders) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $csvHeaders);
+
+            foreach ($attendances as $attendance) {
+                fputcsv($file, [
+                    $attendance->attendance_id,
+                    $attendance->user_id,
+                    $attendance->nama_lengkap,
+                    $attendance->user_email,
+                    $attendance->attendance_date,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        // Return response for CSV download
+        return response()->stream($callback, 200, [
+            "Content-Type" => "text/csv",
+            "Content-Disposition" => "attachment; filename={$fileName}",
+        ]);
     }
+
 
     public function deleteAttendance($id)
     {

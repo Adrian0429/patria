@@ -17,7 +17,6 @@ class CheckRole
         $userRole = Auth::user()->role;
 
         if (!in_array($userRole, $roles)) {
-            // If the role is not allowed, redirect to home with an error
             return redirect()->route('home')->with('error', 'You do not have access to this page.');
         }
 

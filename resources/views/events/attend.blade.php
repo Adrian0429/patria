@@ -44,7 +44,12 @@
 
         h1 {
             font-weight: 600;
-            font-size: 2rem;
+            font-size: 1.75rem;
+            margin: 1rem 0;
+        }
+        .absensi-text {
+            font-weight: 800;
+            font-size: 2.5rem;
         }
 
         #scanner-container {
@@ -172,7 +177,7 @@
 <body>
     <div class="main-container">
         <div class="container">
-            <h1>Selamat Datang Patria!</h1>
+            <h1 class="absensi-text">ABSENSI</h1>
             <h1>{{ $event->name }}</h1>
             <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
 
@@ -186,6 +191,85 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.getElementById("permission-button").addEventListener("click", function () {
+            if (!localStorage.getItem("cameraPermissionGranted")) {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then((stream) => {
+                        console.log("Camera permission granted!");
+                        alert("Camera permission granted. You can now start scanning.");
+                        
+                        localStorage.setItem("cameraPermissionGranted", "true");
+
+                        // Stop the stream after permission check
+                        stream.getTracks().forEach((track) => track.stop());
+
+                        // Display scanner and hide the button
+                        document.getElementById("scanner-container").style.display = "block";
+                        document.getElementById("permission-button").style.display = "none";
+
+                        // Initialize QR Code Scanner
+                        const html5QrcodeScanner = new Html5QrcodeScanner(
+                            "scanner-container", { fps: 10, qrbox: 250 }, false
+                        );
+
+                        html5QrcodeScanner.render(onScanSuccess);
+
+                        const stopButton = document.querySelector(".html5-qrcode-button-stop");
+                        if (stopButton) {
+                            stopButton.parentElement.removeChild(stopButton);
+                        }
+                    })
+                    .catch((err) => {
+                        console.error("Camera permission error:", err);
+                        alert("Camera permission denied. Please enable camera access in your browser settings.");
+                    });
+            } else {
+                document.getElementById("scanner-container").style.display = "block";
+                document.getElementById("permission-button").style.display = "none";
+
+                // Initialize QR Code Scanner
+                const html5QrcodeScanner = new Html5QrcodeScanner(
+                    "scanner-container", { fps: 10, qrbox: 250 }, false
+                );
+
+                html5QrcodeScanner.render(onScanSuccess);
+
+                // Remove the stop scanning button after rendering
+                const stopButton = document.querySelector(".html5-qrcode-button-stop");
+                if (stopButton) {
+                    stopButton.parentElement.removeChild(stopButton);
+                }
+            }
+        });
+
+        let lastOpenedTime = 0;
+
+        function onScanSuccess(qrCodeMessage) {
+            const currentTime = new Date().getTime();
+
+            if (currentTime - lastOpenedTime >= 500) {
+                console.log("Scanned QR Code:", qrCodeMessage);
+
+                const urlParts = qrCodeMessage.split("/");
+                const userId = urlParts[urlParts.length - 1];
+
+                const userIdInput = document.getElementById("userId");
+                userIdInput.value = userId;
+
+                const form = document.getElementById("searchForm");
+                form.submit();
+
+                lastOpenedTime = currentTime;
+            } else {
+                console.log("Window opening too soon. Please wait 0.5 seconds.");
+            }
+        }
+
+    </script>
+
+
     @if (session('error'))
     <script>
         Toastify({

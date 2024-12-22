@@ -85,7 +85,7 @@
         .dropdown-menu {
             display: none;
             position: absolute;
-            top: 100%; /* Position below the button */
+            top: 100%; 
             right: 0;
             padding: 1rem;
             background-color: white;
@@ -110,21 +110,25 @@
         }
 
         .dropdown:hover .dropdown-menu {
-            display: block; /* Show the menu when the dropdown is hovered */
+            display: block; 
         }
 
         .button-logout{
+            margin-top: 12px;
             background-color: #dc3545;
             color: white;
-            padding: 10px 15px;
+            text-decoration: none;
+            padding: 10px 64px;
             font-size: 16px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            width: 100%;
         }
 
         .button-profile{
+            width: 100%;
             background-color: #007BFF;
             color: white;
             text-decoration: none;

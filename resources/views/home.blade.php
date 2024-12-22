@@ -1,13 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <title>Patria Management</title>
 
     <style>
         body {
@@ -30,7 +20,7 @@
         .container {
             text-align: center;
             background: rgba(11, 25, 44, 0.9);
-            padding: 0.75rem;
+            padding: 1.55rem 1rem;
             border-radius: 12px;
             box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
             max-width: 500px;
@@ -167,9 +157,8 @@
             }
         }
     </style>
-</head>
-    @include('partials.navbar')
-<body>
+@extends('layouts.app')
+@section('content')
     <div class="main-container">
         <div class="container">
             <h1>Selamat Datang Patria!</h1>
@@ -186,16 +175,15 @@
         </div>
     </div>
 
+
     <script>
         document.getElementById("permission-button").addEventListener("click", function () {
-            // Check if camera permission has already been granted
             if (!localStorage.getItem("cameraPermissionGranted")) {
                 navigator.mediaDevices.getUserMedia({ video: true })
                     .then((stream) => {
                         console.log("Camera permission granted!");
                         alert("Camera permission granted. You can now start scanning.");
                         
-                        // Save the camera permission state in localStorage
                         localStorage.setItem("cameraPermissionGranted", "true");
 
                         // Stop the stream after permission check
@@ -212,7 +200,6 @@
 
                         html5QrcodeScanner.render(onScanSuccess);
 
-                        // Remove the stop scanning button after rendering
                         const stopButton = document.querySelector(".html5-qrcode-button-stop");
                         if (stopButton) {
                             stopButton.parentElement.removeChild(stopButton);
@@ -223,7 +210,6 @@
                         alert("Camera permission denied. Please enable camera access in your browser settings.");
                     });
             } else {
-                // If permission is already granted, just show the scanner
                 document.getElementById("scanner-container").style.display = "block";
                 document.getElementById("permission-button").style.display = "none";
 
@@ -242,18 +228,16 @@
             }
         });
 
-        let lastOpenedTime = 0; // Store the last time the window was opened
+        let lastOpenedTime = 0;
 
         function onScanSuccess(qrCodeMessage) {
             const currentTime = new Date().getTime();
             
-            // Only open a new window if 500ms have passed since the last one
             if (currentTime - lastOpenedTime >= 500) {
                 console.log("Scanned QR Code:", qrCodeMessage);
-                var url = '/users/' + qrCodeMessage;
-                window.open(url, '_blank');
-                
-                // Update the last opened time to the current time
+                // var url = '/users/' + qrCodeMessage;
+                window.open(qrCodeMessage, '_blank');
+
                 lastOpenedTime = currentTime;
             } else {
                 console.log("Window opening too soon. Please wait 0.5 seconds.");
@@ -261,7 +245,7 @@
         }
 
         document.getElementById('searchForm').addEventListener('submit', function (event) {
-            event.preventDefault();  // Prevent the default form submission
+            event.preventDefault(); 
 
             var userId = document.getElementById('userId').value;
 
@@ -271,5 +255,4 @@
         });
     </script>
 
-</body>
-</html>
+@endsection

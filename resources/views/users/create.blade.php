@@ -31,6 +31,11 @@
             font-size: 0.9rem;
         }
 
+        .button-row{
+            display: flex;
+            justify-content: space-between;
+        }
+
 .btn-add-user {
     display: inline-block;
     padding: 10px 20px;
@@ -62,10 +67,18 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center text-primary font-bold">Tambahkan Anggota Baru</h1>
-        <a href="{{ route('users.home') }}" class="btn-add-user">Daftar Anggota</a>
+        <div class="button-row">
+            <a href="{{ route('users.home') }}" class="btn-add-user">Daftar Anggota</a>
+            <a href="{{ route('users.template') }}" class="btn-add-user">Download CSV Template</a>
+        </div>
+
         <div class="card p-4">
             <form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
+                <div class="mb-3">
+                    <label for="csv_file" class="form-label">Upload CSV File:</label>
+                    <input type="file"  class="form-control" name="csv_file" id="csv_file" accept=".csv">
+                </div>
                 <div class="row">
                     
                     <div class="col-md-6 mb-3">

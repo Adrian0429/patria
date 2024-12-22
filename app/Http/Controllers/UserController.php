@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Response;
 
 class UserController extends Controller
 {
@@ -44,36 +46,91 @@ class UserController extends Controller
         return view('users.create'); 
     }
 
+
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'card_id' => 'nullable|string|unique:users,card_id|max:20',
-            'user_id' => 'required|string|unique:users,user_id|max:20',
-            'nama_lengkap' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-            'tanggal_lahir' => 'required|date',
-            'golongan_darah' => 'required|string|max:3',
-            'vihara' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg',
-            'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:admin,DPP,DPC,Anggota',
-            'password' => 'required|string|min:8',
-        ]);
+        if ($request->hasFile('csv_file')) {
+            // Handle CSV Input
+            $request->validate([
+                'csv_file' => 'required|file|mimes:csv,txt',
+            ]);
 
-        if ($request->hasFile('image')) {
-            $extension = $request->file('image')->getClientOriginalExtension(); // Get file extension
-            $imageName = $validatedData['user_id'] . '.' . $extension; // Use user_id as the filename
+            $file = $request->file('csv_file');
+            $filePath = $file->getRealPath();
+            $rows = array_map('str_getcsv', file($filePath));
 
-            $path = $request->file('image')->storeAs('images', $imageName, 'public');
-            $validatedData['image_link'] = $path;
+            // Extract the header
+            $header = array_map('trim', $rows[0]);
+            unset($rows[0]); // Remove header row
+
+            $errors = [];
+            $successCount = 0;
+
+            foreach ($rows as $index => $row) {
+                $row = array_combine($header, $row);
+
+                // Validate each row
+                $validator = Validator::make($row, [
+                    'card_id' => 'nullable|string|unique:users,card_id|max:20',
+                    'user_id' => 'required|string|unique:users,user_id|max:20',
+                    'nama_lengkap' => 'required|string|max:255',
+                    'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+                    'tanggal_lahir' => 'required|date',
+                    'golongan_darah' => 'required|string|max:3',
+                    'vihara' => 'required|string|max:255',
+                    'email' => 'required|email|unique:users,email',
+                    'role' => 'required|in:admin,DPP,DPC,Anggota',
+                    'password' => 'required|string|min:8',
+                ]);
+
+                if ($validator->fails()) {
+                    $errors[$index + 1] = $validator->errors()->all();
+                    continue;
+                }
+
+                $validatedData = $validator->validated();
+                $validatedData['password'] = bcrypt($validatedData['password']);
+
+                User::create($validatedData);
+                $successCount++;
+            }
+
+            return redirect()->route('users.home')->with([
+                'success' => "{$successCount} users created successfully.",
+                'error' => count($errors) ? "Some rows failed to import." : null,
+                'import_errors' => $errors,
+            ]);
+        } else {
+            // Handle Web Form Input
+            $validatedData = $request->validate([
+                'card_id' => 'nullable|string|unique:users,card_id|max:20',
+                'user_id' => 'required|string|unique:users,user_id|max:20',
+                'nama_lengkap' => 'required|string|max:255',
+                'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
+                'tanggal_lahir' => 'required|date',
+                'golongan_darah' => 'required|string|max:3',
+                'vihara' => 'required|string|max:255',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg',
+                'email' => 'required|email|unique:users,email',
+                'role' => 'required|in:admin,DPP,DPC,Anggota',
+                'password' => 'required|string|min:8',
+            ]);
+
+            if ($request->hasFile('image')) {
+                $extension = $request->file('image')->getClientOriginalExtension();
+                $imageName = $validatedData['user_id'] . '.' . $extension;
+
+                $path = $request->file('image')->storeAs('images', $imageName, 'public');
+                $validatedData['image_link'] = $path;
+            }
+
+            $validatedData['password'] = bcrypt($validatedData['password']);
+            User::create($validatedData);
+
+            return redirect()->route('users.home')->with('success', 'User created successfully.');
         }
-
-        $validatedData['password'] = bcrypt($validatedData['password']);
-
-        $user = User::create($validatedData);
-
-        return redirect()->route('users.home')->with('success', 'User created successfully.');
     }
+
 
     public function show($idOrCardId)
     {
@@ -81,11 +138,10 @@ class UserController extends Controller
             $user = User::where('user_id', $idOrCardId)
                         ->orWhere('card_id', $idOrCardId)
                         ->firstOrFail();
-                        
+
             return view('users.show', compact('user'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            // Redirect back with an error message
-            return redirect()->back()->with('error', 'User not found.');
+            return redirect()->back()->with('error', 'User not found. Please try again.');
         }
     }
 
@@ -106,52 +162,65 @@ class UserController extends Controller
         }
 
         $user = User::findOrFail($id);
+        // dd($user);
         return view('users.edit', compact('user'));
     }
 
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        try {
+            $user = User::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'card_id' => 'nullable|string|max:20',
-            'user_id' => 'nullable|string|max:20',
-            'nama_lengkap' => 'nullable|string|max:255',
-            'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
-            'tanggal_lahir' => 'nullable|date',
-            'golongan_darah' => 'nullable|string|max:3',
-            'vihara' => 'nullable|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg',
-            'email' => 'nullable|email|unique:users,email,' . $id . ',user_id',
-            'role' => 'nullable|in:admin,DPP,DPC,Anggota',
-            'password' => 'nullable|string',
-        ]);
+            $validatedData = $request->validate([
+                'card_id' => 'nullable|string|max:20',
+                'user_id' => 'nullable|string|max:20',
+                'nama_lengkap' => 'nullable|string|max:255',
+                'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
+                'tanggal_lahir' => 'nullable|date',
+                'golongan_darah' => 'nullable|string|max:3',
+                'vihara' => 'nullable|string|max:255',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg',
+                'email' => 'nullable|email|unique:users,email,' . $id . ',user_id',
+                'role' => 'nullable|in:admin,DPP,DPC,Anggota',
+                'password' => 'nullable|string',
+            ]);
 
-        if ($request->hasFile('image')) {
-            // Delete the old image if it exists
-            if ($user->image_link) {
-                Storage::disk('public')->delete($user->image_link);
+            if ($request->hasFile('image')) {
+                // Delete the old image if exists
+                if ($user->image_link) {
+                    Storage::disk('public')->delete($user->image_link);
+                }
+
+                $extension = $request->file('image')->getClientOriginalExtension(); 
+                $imageName = $user->user_id . '.' . $extension;
+
+                $path = $request->file('image')->storeAs('images', $imageName, 'public');
+                $validatedData['image_link'] = $path;
             }
 
-            $extension = $request->file('image')->getClientOriginalExtension(); // Get file extension
-            $imageName = $user->user_id . '.' . $extension; // Use user_id as the filename
+            if ($request->filled('password')) {
+                $validatedData['password'] = bcrypt($request->input('password'));
+            }
 
-            // Store the image in the 'images' directory with the desired name
-            $path = $request->file('image')->storeAs('images', $imageName, 'public');
-            $validatedData['image_link'] = $path;
+            // Filter out null values
+            $filteredData = array_filter($validatedData, function ($value) {
+                return $value !== null;
+            });
+
+            $user->update($filteredData);
+
+            return redirect()->route('users.home')->with('success', 'User updated successfully.');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'User not found.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput()
+                ->with('error', 'Validation failed. Please check your input.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'An unexpected error occurred: ' . $e->getMessage());
         }
-
-        if ($request->filled('password')) {
-            $validatedData['password'] = bcrypt($request->input('password'));
-        }
-
-        $filteredData = array_filter($validatedData, function ($value) {
-            return $value !== null;
-        });
-
-        $user->update($filteredData);
-
-        return redirect()->route('users.home')->with('success', 'User updated successfully.');
     }
 
     public function destroy($id)
@@ -166,4 +235,29 @@ class UserController extends Controller
 
         return redirect()->route('users.home')->with('success', 'User deleted successfully.');
     }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            'card_id', 'user_id', 'nama_lengkap', 'jenis_kelamin', 
+            'tanggal_lahir', 'golongan_darah', 'vihara', 
+            'email', 'role', 'password'
+        ];
+
+        $exampleRow = [
+            '12345', 'USR001', 'John Doe', 'Laki-laki', 
+            '1990-01-01', 'A', 'Buddhist Temple', 
+            'johndoe@example.com', 'admin', 'password123'
+        ];
+
+        $csvContent = implode(',', $headers) . "\n" . implode(',', $exampleRow);
+
+        $filename = "user_template.csv";
+
+        return Response::make($csvContent, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=$filename",
+        ]);
+    }
+    
 }

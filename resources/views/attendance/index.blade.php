@@ -2,28 +2,39 @@
 .main-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 84px);
+    height: calc(100vh - 84px); 
     box-sizing: border-box;
-    padding: 0 20px 20px 20px;
+    padding: 0px 20px 20px 20px;
 }
 
+.judul-event { 
+    margin: 10px 0px;
+    font-size: 2rem;
+    font-weight: bold;
+    color: #333;
+}
 .table-responsive {
-    height: calc(100vh - 84px);
     overflow-y: auto; 
+    flex-grow: 1; /* Allow it to take remaining space naturally */
+    display: flex;
+    flex-direction: column;
 }
 
 .table {
-    flex: 1;
     width: 100%;
-    height: 80%;
     border-collapse: collapse;
     background-color: #fff;
     margin-bottom: 12px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
 }
+
+.table tbody {
+    flex-grow: 1;
+    display: table-row-group; /* Keep natural row structure */
+}
+
 
 .table th, .table td {
     padding: 6px 7px;
@@ -89,7 +100,6 @@
     background-color: #f8f9fa;
     border-color: #ddd;
 }
-
 
 /* Buttons */
 .btn {
@@ -165,10 +175,8 @@
     flex-direction: column;
     justify-content: center; /* Center buttons vertically */
     align-items: center; /* Center buttons horizontally */
-    gap: 8px; /* Add spacing between buttons */
     min-width: 150px; /* Ensure enough space for the buttons */
 }
-
 
 .modal {
     display: none;
@@ -224,13 +232,13 @@
 .btn-danger:hover {
     background-color: #bd2130;
 }
+
 </style>
 @extends('layouts.app')
-<!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <h3>Confirm Deletion</h3>
-        <p>Are you sure you want to delete this event?</p>
+        <p>Are you sure you want to delete this attendance?</p>
         <div class="modal-actions">
             <button id="cancelButton" class="btn btn-secondary">Cancel</button>
             <form id="deleteForm" method="POST">
@@ -243,55 +251,53 @@
 </div>
 @section('content')
 <div class="main-container">
-        
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
+            
+    <h1 class="judul-event">Daftar Absensi : {{ $event->name }}</h1>
+    <a href="{{ route('attendance.download', $event->id) }}" class="btn-add-event">
+        Download CSV
+    </a>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID Anggota</th>
+                    <th>Nama Anggota</th>
+                    <th>Email Anggota</th>
+                    <th>Tanggal Absen</th>
+                    <th>aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($attendances as $attendance)
                     <tr>
-                        <th>Event ID</th>
-                        <th>Nama Event</th>
-                        <th>ID Anggota</th>
-                        <th>Nama Anggota</th>
-                        <th>Email Anggota</th>
-                        <th>Tanggal Absen</th>
+                        <td>{{ $attendance->user_id }}</td>
+                        <td>{{ $attendance->nama_lengkap }}</td>
+                        <td>{{ $attendance->user_email }}</td>
+                        <td>{{ $attendance->created_at }}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('attendance.delete', $attendance->id) }}')">Delete</button>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($attendances as $attendance)
-                        <tr>
-                            <td>{{ $attendance->event_id }}</td>
-                            <td>{{ $attendance->event_name }}</td>
-                            <td>{{ $attendance->user_id }}</td>
-                            <td>{{ $attendance->nama_lengkap }}</td>
-                            <td>{{ $attendance->user_email }}</td>
-                            <td>{{ $attendance->created_at }}</td>
-                            {{-- <td>
-                                <a href="{{ route('attendances.attend', $attendance->id) }}" class="btn btn-info btn-sm">Absen</a>
-                                <a href="{{ route('attendance.index', $attendance->id) }}" class="btn btn-info btn-sm">Daftar Absen</a>
-                                <a href="{{ route('attendances.edit', $attendance->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('attendances.delete', $attendance->id) }}')">Delete</a>
-                            </td> --}}
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-        {{-- <nav aria-label="Page navigation">
+        <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">
-                <li class="page-item {{ $events->onFirstPage() ? 'disabled' : '' }}">
-                    <a class="page-link" href="{{ $events->previousPageUrl() }}" tabindex="-1">Previous</a>
+                <li class="page-item {{ $attendances->onFirstPage() ? 'disabled' : '' }}">
+                    <a class="page-link" href="{{ $attendances->previousPageUrl() }}" tabindex="-1">Previous</a>
                 </li>
-                @foreach ($events->getUrlRange(1, $events->lastPage()) as $page => $url)
-                    <li class="page-item {{ $page == $events->currentPage() ? 'active' : '' }}">
+                @foreach ($attendances->getUrlRange(1, $attendances->lastPage()) as $page => $url)
+                    <li class="page-item {{ $page == $attendances->currentPage() ? 'active' : '' }}">
                         <a class="page-link" href="{{ $url }}">{{ $page }}</a>
                     </li>
                 @endforeach
-                <li class="page-item {{ $events->hasMorePages() ? '' : 'disabled' }}">
-                    <a class="page-link" href="{{ $events->nextPageUrl() }}">Next</a>
+                <li class="page-item {{ $attendances->hasMorePages() ? '' : 'disabled' }}">
+                    <a class="page-link" href="{{ $attendances->nextPageUrl() }}">Next</a>
                 </li>
             </ul>
-        </nav> --}}
+        </nav>
     </div>
     <script>
     const deleteModal = document.getElementById('deleteModal');

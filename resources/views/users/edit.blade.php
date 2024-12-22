@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create User</title>
-    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Toastify CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         body {
@@ -55,14 +52,14 @@
     outline: none;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Focus ring */
 }
-    </style>
-    <!-- Toastify JS -->
+</style>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
 <body>
     <div class="container mt-5">
         <h1 class="text-center text-primary font-bold">Edit Anggota</h1>
-        @if(Auth::user()->role == 'admin')
+
+        @if(Auth::user()->role == 'admin' || Auth::user()->role == 'DPP')
         <a href="{{ route('users.home') }}" class="btn-add-user">Daftar Anggota</a>
         @else
         <a href="{{ route('home') }}" class="btn-add-user">Kembali</a>  
@@ -116,7 +113,7 @@
                     
                     <div class="col-md-6 mb-3">
                         <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
-                        <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir">
+                        <input type="date" class="form-control" id="tanggal_lahir" name="tanggal_lahir" value="{{ $user->tanggal_lahir }}">
                     </div>
                     
                     <div class="col-md-6 mb-3">
