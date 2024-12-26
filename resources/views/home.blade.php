@@ -37,7 +37,7 @@
         }
 
         #scanner-container {
-            margin: 0 auto;
+            margin: 20px auto;
             width: 100%;
             max-width: 170px;
             height: 170px;

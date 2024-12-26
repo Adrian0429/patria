@@ -57,7 +57,7 @@
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center text-primary font-bold">Edit Anggota</h1>
+        <h1 class="text-center text-primary font-bold">Edit Anggota: <strong>{{ $user->nama_lengkap }}</strong></h1>
 
         @if(Auth::user()->role == 'admin' || Auth::user()->role == 'DPP')
         <a href="{{ route('users.home') }}" class="btn-add-user">Daftar Anggota</a>

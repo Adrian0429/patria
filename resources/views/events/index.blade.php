@@ -15,27 +15,25 @@
 .table {
     flex: 1;
     width: 100%;
-    height: 80%;
     border-collapse: collapse;
     background-color: #fff;
     margin-bottom: 12px;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
 }
 
+
 .table th, .table td {
-    padding: 6px 7px;
-    border-bottom: 1px solid #ddd;
+    padding: 10px 10px;
     font-size: 0.95rem;
     text-align: center;
-    word-wrap: break-word; /* Ensures text wraps within the cell */
+    word-wrap: break-word; 
 }
 
 .table th {
     position: sticky; /* Makes the header sticky */
-    top: 0; /* Stick to the top of the container */
+    top: 0;
     background-color: #f4f4f4; /* Sticky header background */
     font-weight: bold;
     color: #333;
@@ -159,16 +157,6 @@
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Focus ring */
 }
 
-.table td:last-child {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
-    justify-content: center; /* Center buttons vertically */
-    align-items: center; /* Center buttons horizontally */
-    gap: 8px; /* Add spacing between buttons */
-    min-width: 150px; /* Ensure enough space for the buttons */
-}
-
 
 .modal {
     display: none;
@@ -224,9 +212,25 @@
 .btn-danger:hover {
     background-color: #bd2130;
 }
+
+.user-picture {
+    width: auto;
+    height: 200px;
+    object-fit: cover;
+}
+
+.table td:last-child {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 10px;
+    height: 100%;
+}
+
+
 </style>
 @extends('layouts.app')
-<!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <h3>Confirm Deletion</h3>
@@ -243,7 +247,7 @@
 </div>
 @section('content')
 <div class="main-container">
-        <!-- Add button to redirect to the create event page -->
+
         <a href="{{ route('events.createEventForm') }}" class="btn-add-event">Tambahkan Event</a>
         
         <div class="table-responsive">
