@@ -12,11 +12,45 @@
 
         .main-container { 
             display: flex;
+            position: relative;
             justify-content: center;
             align-items: center;
             height: calc(100vh - 84px);
         }
 
+        .header-logo{
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            top: 0;
+            left: 0;
+            margin-left: 5rem;
+            margin-top: 2rem;
+        }
+
+        .logo-patria { 
+            width: 6rem;
+            height: auto;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;700;800&display=swap');
+
+        .header-text { 
+            margin-left: 1rem;
+            color: white;
+            font-size: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .header-text .top {
+            font-weight: 200; /* Light weight */
+        }
+
+        .header-text .bottom {
+            font-weight: 700; /* Extra-bold weight */
+        }
+        
         .container {
             text-align: center;
             background: rgba(11, 25, 44, 0.9);
@@ -160,6 +194,14 @@
 @extends('layouts.app')
 @section('content')
     <div class="main-container">
+        <div class="header-logo">
+            <img src="./logo_putih.png" alt="" class="logo-patria">
+            <div class="header-text">
+                <p class="top">DATA ANGGOTA</p>
+                <p class="bottom">PEMUDA THERAVĀDA INDONESIA</p>
+            </div>
+        </div>
+        
         <div class="container">
             <h1>Selamat Datang Patria!</h1>
             <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
@@ -177,9 +219,10 @@
 
 
     <script>
+        
         document.getElementById("permission-button").addEventListener("click", function () {
             if (!localStorage.getItem("cameraPermissionGranted")) {
-                navigator.mediaDevices.getUserMedia({ video: true })
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                     .then((stream) => {
                         console.log("Camera permission granted!");
                         alert("Camera permission granted. You can now start scanning.");

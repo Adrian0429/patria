@@ -20,12 +20,15 @@ class UserController extends Controller
         }
         else if(auth()->user()->role == 'DPP') {
             $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
-        } else if(auth()->user()->role == 'DPC') {
+        } else if(auth()->user()->role == 'DPD') {
             $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->paginate(10);
-        } else {
+        } else if(auth()->user()->role == 'DPC') {
+            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->paginate(10);
+        } else if(auth()->user()->role == 'DPAC') {
+            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->where('role', '!=', 'DPC')->paginate(10); 
+        }else {
             return view('users.profile');
         }
-
         return view('users.home', compact('users'));
     }
 
@@ -46,11 +49,9 @@ class UserController extends Controller
         return view('users.create'); 
     }
 
-
     public function store(Request $request)
     {
         if ($request->hasFile('csv_file')) {
-            // Handle CSV Input
             $request->validate([
                 'csv_file' => 'required|file|mimes:csv,txt',
             ]);
@@ -101,7 +102,6 @@ class UserController extends Controller
                 'import_errors' => $errors,
             ]);
         } else {
-            // Handle Web Form Input
             $validatedData = $request->validate([
                 'card_id' => 'nullable|string|unique:users,card_id|max:20',
                 'user_id' => 'required|string|unique:users,user_id|max:20',

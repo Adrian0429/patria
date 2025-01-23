@@ -32,6 +32,40 @@
             gap: 1.5rem;
         }
 
+
+        .header-logo{
+            position: absolute;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            top: 0;
+            left: 0;
+            margin-left: 5rem;
+            margin-top: 2rem;
+        }
+
+        .logo-patria { 
+            width: 6rem;
+            height: auto;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;700;800&display=swap');
+
+        .header-text { 
+            margin-left: 1rem;
+            color: white;
+            font-size: 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .header-text .top {
+            font-weight: 200; /* Light weight */
+        }
+
+        .header-text .bottom {
+            font-weight: 700; /* Extra-bold weight */
+        }
+        
         .user-picture-container {
             flex: 1;
             justify-content: center;
@@ -141,7 +175,13 @@
 </head>
 <body>
     <div class="container">
-        
+        <div class="header-logo">
+            <img src="/logo_putih.png" alt="" class="logo-patria">
+            <div class="header-text">
+                <p class="top">DATA ANGGOTA</p>
+                <p class="bottom">PEMUDA THERAVĀDA INDONESIA</p>
+            </div>
+        </div>
         <div class="user-picture-container">
             @if($user->image_link)
             <img class="user-picture" src="{{ asset('storage/' . $user->image_link) }}"/>

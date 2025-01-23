@@ -27,6 +27,7 @@ class User extends Authenticatable // Change from Model to Authenticatable
         'vihara',
         'image_link',
         'role',
+        'daerah',
     ];
 
     public function attendances()

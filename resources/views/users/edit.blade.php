@@ -119,7 +119,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="golongan_darah" class="form-label">Golongan Darah</label>
                         <select class="form-select" id="golongan_darah" name="golongan_darah">
-                            <option value="" disabled>Select Blood Group</option>
+                            <option value="" disabled>Golongan Darah</option>
                             <option value="O" {{ $user->golongan_darah == 'O' ? 'selected' : '' }}>O</option>
                             <option value="A" {{ $user->golongan_darah == 'A' ? 'selected' : '' }}>A</option>
                             <option value="B" {{ $user->golongan_darah == 'B' ? 'selected' : '' }}>B</option>
@@ -128,13 +128,15 @@
                     </div>
                 </div>
                 <div class="row">
-                    @if (Auth::user()->jabatan == 'admin')
+                    @if (Auth::user()->jabatan == 'admin' || Auth::user()->jabatan == 'DPC')
                     <div class="col-md-6 mb-3">
                         <label for="role" class="form-label">Jabatan</label>
                         <select class="form-select" id="role" name="role">
                             <option value="" disabled>Select Role</option>
                             <option value="DPP" {{ $user->jabatan == 'DPP' ? 'selected' : '' }}>DPP</option>
+                            <option value="DPD" {{ $user->jabatan == 'DPD' ? 'selected' : '' }}>DPD</option>
                             <option value="DPC" {{ $user->jabatan == 'DPC' ? 'selected' : '' }}>DPC</option>
+                            <option value="DPAC" {{ $user->jabatan == 'DPAC' ? 'selected' : '' }}>DPAC</option>
                             <option value="User" {{ $user->jabatan == 'User' ? 'selected' : '' }}>Anggota</option>
                         </select>
                     </div>

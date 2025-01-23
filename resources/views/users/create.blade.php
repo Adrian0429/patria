@@ -113,7 +113,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="jenis_kelamin" class="form-label">Jenis Kelamin</label>
                         <select class="form-select" id="jenis_kelamin" name="jenis_kelamin" required>
-                            <option value="" disabled selected>Select Gender</option>
+                            <option value="" disabled selected>Jenis Kelamin</option>
                             <option value="Laki-laki">Laki-laki</option>
                             <option value="Perempuan">Perempuan</option>
                         </select>
@@ -129,7 +129,7 @@
                     <div class="col-md-6 mb-3">
                         <label for="golongan_darah" class="form-label">Golongan Darah</label>
                         <select class="form-select" id="golongan_darah" name="golongan_darah">
-                            <option value="" disabled selected>Select Blood Group</option>
+                            <option value="" disabled selected>Golongan Darah</option>
                             <option value="O">O</option>
                             <option value="A">A</option>
                             <option value="B">B</option>
@@ -142,9 +142,11 @@
                     <div class="col-md-6 mb-3">
                         <label for="role" class="form-label">Jabatan</label>
                         <select class="form-select" id="role" name="role" required>
-                            <option value="" disabled selected>Select Role</option>
+                            <option value="" disabled selected>Jabatan</option>
                             <option value="DPP">DPP</option>
+                            <option value="DPD">DPD</option>
                             <option value="DPC">DPC</option>
+                            <option value="DPAC">DPAC</option>
                             <option value="Anggota">Anggota</option>
                         </select>
                     </div>
@@ -154,7 +156,14 @@
                         <input type="text" class="form-control" id="vihara" name="vihara" placeholder="Enter Vihara" required>
                     </div>
                 </div>
-                
+
+                <div class="col-md-6 mb-3">
+                    <label for="daerah" class="form-label">Daerah</label>
+                    <select class="form-select" id="daerah" name="daerah" required>
+                        <option value="" disabled selected>Pilih Daerah</option>
+                    </select>
+                </div>
+
                 <div class="mb-3">
                     <label for="image" class="form-label">Profile Image</label>
                     <input type="file" class="form-control" id="image" name="image">
@@ -164,6 +173,7 @@
             </form>
         </div>
     </div>
+    
     <!-- Toastify Script -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -180,6 +190,56 @@
                 @endforeach
             @endif
         });
-    </script>
+    // Array of provinsi
+    const provinsi = [
+        "Aceh", "Sumatera Utara", "Sumatera Barat", "Riau", "Kepulauan Riau", "Jambi",
+        "Sumatera Selatan", "Bangka Belitung", "Bengkulu", "Lampung", "DKI Jakarta", "Banten",
+        "Jawa Barat", "Jawa Tengah", "DI Yogyakarta", "Jawa Timur", "Bali", "Nusa Tenggara Barat",
+        "Nusa Tenggara Timur", "Kalimantan Barat", "Kalimantan Tengah", "Kalimantan Selatan",
+        "Kalimantan Timur", "Kalimantan Utara", "Sulawesi Utara", "Sulawesi Tengah",
+        "Sulawesi Selatan", "Sulawesi Tenggara", "Sulawesi Barat", "Gorontalo", "Maluku",
+        "Maluku Utara", "Papua", "Papua Barat", "Papua Tengah", "Papua Pegunungan", "Papua Selatan",
+        "Papua Barat Daya"
+    ];
+
+    // Array of kabupaten
+    const kabupaten = [
+        "Banda Aceh", "Sabang", "Langsa", "Lhokseumawe", "Subulussalam", "Medan", "Binjai",
+        "Tebing Tinggi", "Pematang Siantar", "Sibolga", "Padang", "Bukittinggi", "Payakumbuh",
+        "Pariaman", "Solok", "Pekanbaru", "Dumai", "Tanjung Pinang", "Batam", "Jambi",
+        "Sungai Penuh", "Palembang", "Lubuk Linggau", "Prabumulih", "Pagar Alam", "Pangkal Pinang",
+        "Bengkulu", "Bandar Lampung", "Metro", "Jakarta Pusat", "Jakarta Barat", "Jakarta Timur",
+        "Jakarta Selatan", "Jakarta Utara", "Serang", "Cilegon", "Tangerang", "Tangerang Selatan",
+        "Bandung", "Bogor", "Bekasi", "Cimahi", "Depok", "Semarang", "Solo", "Magelang",
+        "Pekalongan", "Salatiga", "Yogyakarta", "Surabaya", "Malang", "Kediri", "Blitar",
+        "Denpasar", "Mataram", "Bima", "Kupang", "Ende", "Maumere", "Pontianak", "Singkawang",
+        "Palangka Raya", "Banjarmasin", "Banjarbaru", "Samarinda", "Balikpapan", "Bontang",
+        "Tanjung Selor", "Manado", "Bitung", "Tomohon", "Palu", "Makassar", "Parepare", "Palopo",
+        "Kendari", "Baubau", "Mamuju", "Gorontalo", "Ambon", "Tual", "Ternate", "Tidore",
+        "Jayapura", "Manokwari", "Sorong", "Nabire", "Wamena", "Merauke", "Fakfak", "Kaimana"
+    ];
+
+    const roleDropdown = document.getElementById("role");
+    const daerahDropdown = document.getElementById("daerah");
+
+    roleDropdown.addEventListener("change", () => {
+        const role = roleDropdown.value;
+        let options = []; // Clear options
+
+        if (role === "DPP" || role === "DPD") {
+            options = provinsi;
+        } else if (role === "DPC" || role === "DPAC") {
+            options = kabupaten;
+        }
+
+        daerahDropdown.innerHTML = `<option value="" disabled selected>Pilih Daerah</option>`;
+        options.forEach(daerah => {
+            const optionElement = document.createElement("option");
+            optionElement.value = daerah;
+            optionElement.textContent = daerah;
+            daerahDropdown.appendChild(optionElement);
+        });
+    });
+</script>
 </body>
 </html>
