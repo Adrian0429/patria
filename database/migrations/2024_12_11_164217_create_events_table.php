@@ -13,6 +13,8 @@ class CreateEventsTable extends Migration
             $table->string('logo')->nullable();
             $table->date('start_date');
             $table->date('end_date');
+            $table->string('created_by', 20);
+            $table->foreign('created_by')->references('user_id')->on('users')->onDelete('cascade'); // Foreign key
             $table->timestamps();
         });
     }

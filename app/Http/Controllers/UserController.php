@@ -21,11 +21,11 @@ class UserController extends Controller
         else if(auth()->user()->role == 'DPP') {
             $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
         } else if(auth()->user()->role == 'DPD') {
-            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->paginate(10);
+            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('daerah', "=", auth()->user()->daerah)->paginate(10);
         } else if(auth()->user()->role == 'DPC') {
-            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->paginate(10);
+            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->where('daerah', "=", auth()->user()->daerah)->paginate(10);
         } else if(auth()->user()->role == 'DPAC') {
-            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->where('role', '!=', 'DPC')->paginate(10); 
+            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->where('role', '!=', 'DPC')->where('daerah', "=", auth()->user()->daerah)->paginate(10); 
         }else {
             return view('users.profile');
         }
@@ -60,9 +60,8 @@ class UserController extends Controller
             $filePath = $file->getRealPath();
             $rows = array_map('str_getcsv', file($filePath));
 
-            // Extract the header
             $header = array_map('trim', $rows[0]);
-            unset($rows[0]); // Remove header row
+            unset($rows[0]);
 
             $errors = [];
             $successCount = 0;
@@ -130,7 +129,6 @@ class UserController extends Controller
             return redirect()->route('users.home')->with('success', 'User created successfully.');
         }
     }
-
 
     public function show($idOrCardId)
     {

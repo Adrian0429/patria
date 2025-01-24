@@ -14,8 +14,12 @@ class LoginController extends Controller
         ]);
 
         if(auth()->attempt($data)) {
-            return redirect()->route('users.home');
-        }else {
+            if(auth()->user()->role == 'Anggota') {
+                return redirect()->route('home');
+            } else {
+                return redirect()->route('users.home');
+            }
+        } else {
             return redirect()->back()->with('error', 'Invalid email or password');
         }
     }

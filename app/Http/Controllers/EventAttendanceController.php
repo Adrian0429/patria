@@ -27,27 +27,27 @@ class EventAttendanceController extends Controller
 
     public function createEvent(Request $request)
     {   
-
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $data = $request->only('name', 'start_date', 'end_date');
-
+        $logoPath = null;
         if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('logo', 'public');
+            $logoPath = $request->file('logo')->store('logos', 'public');
         }
 
-        Event::create($data);
+        // Create the event
+        Event::create([
+            'name' => $validated['name'],
+            'logo' => $logoPath,
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+            'created_by' => auth()->user()->user_id,
+        ]);
 
-        // Redirect with a success message
         return redirect()->route('events.index')->with('success', 'Event created successfully!');
     }
 

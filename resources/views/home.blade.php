@@ -19,20 +19,26 @@
         }
 
         .header-logo{
-            position: absolute;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            top: 0;
-            left: 0;
-            margin-left: 5rem;
-            margin-top: 2rem;
+                position: absolute;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                top: 0;
+                left: 0;
+                margin-left: 5rem;
+                margin-top: 2rem;
         }
 
+        @media (max-width: 768px) {
+                .header-logo {
+                        display: none;
+                }
+        }     
+        
         .logo-patria { 
-            width: 6rem;
-            height: auto;
-        }
+                        width: 6rem;
+                        height: auto;
+                    }
 
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;700;800&display=swap');
 
@@ -209,6 +215,7 @@
             <button id="permission-button">Request Camera Permission</button>
 
             <div id="scanner-container"></div>
+            <button id="switch-camera-button" style="display:none;">Switch Camera</button>
 
             <form id="searchForm" method="GET">
                 <input type="text" id="userId" name="userId" placeholder="Enter Patria ID or Card ID" required>
@@ -219,10 +226,13 @@
 
 
     <script>
-        
+        let currentFacingMode = "environment"; // Default to rear camera
+        let html5QrcodeScanner;
+
+        // Request camera permission and initialize the scanner
         document.getElementById("permission-button").addEventListener("click", function () {
             if (!localStorage.getItem("cameraPermissionGranted")) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
                     .then((stream) => {
                         console.log("Camera permission granted!");
                         alert("Camera permission granted. You can now start scanning.");
@@ -237,30 +247,29 @@
                         document.getElementById("permission-button").style.display = "none";
 
                         // Initialize QR Code Scanner
-                        const html5QrcodeScanner = new Html5QrcodeScanner(
-                            "scanner-container", { fps: 10, qrbox: 250 }, false
-                        );
-
+                        html5QrcodeScanner = new Html5QrcodeScanner("scanner-container", { fps: 10, qrbox: 250 }, false);
                         html5QrcodeScanner.render(onScanSuccess);
 
+                        // Remove the stop scanning button after rendering
                         const stopButton = document.querySelector(".html5-qrcode-button-stop");
                         if (stopButton) {
                             stopButton.parentElement.removeChild(stopButton);
                         }
+
+                        // Show the camera switch button
+                        document.getElementById("switch-camera-button").style.display = "block";
                     })
                     .catch((err) => {
                         console.error("Camera permission error:", err);
                         alert("Camera permission denied. Please enable camera access in your browser settings.");
                     });
             } else {
+                // If permission is already granted
                 document.getElementById("scanner-container").style.display = "block";
                 document.getElementById("permission-button").style.display = "none";
 
                 // Initialize QR Code Scanner
-                const html5QrcodeScanner = new Html5QrcodeScanner(
-                    "scanner-container", { fps: 10, qrbox: 250 }, false
-                );
-
+                html5QrcodeScanner = new Html5QrcodeScanner("scanner-container", { fps: 10, qrbox: 250 }, false);
                 html5QrcodeScanner.render(onScanSuccess);
 
                 // Remove the stop scanning button after rendering
@@ -268,17 +277,50 @@
                 if (stopButton) {
                     stopButton.parentElement.removeChild(stopButton);
                 }
+
+                // Show the camera switch button
+                document.getElementById("switch-camera-button").style.display = "block";
             }
+        });
+
+        // Switch camera functionality
+        document.getElementById("switch-camera-button").addEventListener("click", function () {
+            // Stop the current camera stream
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear();
+            }
+
+            // Toggle between user (front) and environment (rear) cameras
+            currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+
+            // Reinitialize the scanner with the new camera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
+                .then((stream) => {
+                    console.log(`Switched to ${currentFacingMode} camera.`);
+                    
+                    // Reinitialize QR scanner with the new camera
+                    html5QrcodeScanner = new Html5QrcodeScanner("scanner-container", { fps: 10, qrbox: 250 }, false);
+                    html5QrcodeScanner.render(onScanSuccess);
+
+                    // Remove the stop scanning button after rendering
+                    const stopButton = document.querySelector(".html5-qrcode-button-stop");
+                    if (stopButton) {
+                        stopButton.parentElement.removeChild(stopButton);
+                    }
+                })
+                .catch((err) => {
+                    console.error("Error switching camera:", err);
+                    alert("Unable to switch camera. Please try again.");
+                });
         });
 
         let lastOpenedTime = 0;
 
         function onScanSuccess(qrCodeMessage) {
             const currentTime = new Date().getTime();
-            
+
             if (currentTime - lastOpenedTime >= 500) {
                 console.log("Scanned QR Code:", qrCodeMessage);
-                // var url = '/users/' + qrCodeMessage;
                 window.open(qrCodeMessage, '_blank');
 
                 lastOpenedTime = currentTime;
@@ -286,6 +328,7 @@
                 console.log("Window opening too soon. Please wait 0.5 seconds.");
             }
         }
+
 
         document.getElementById('searchForm').addEventListener('submit', function (event) {
             event.preventDefault(); 

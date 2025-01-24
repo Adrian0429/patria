@@ -35,5 +35,9 @@ class User extends Authenticatable // Change from Model to Authenticatable
         return $this->hasMany(Attendance::class);
     }
 
+    public function createdEvents()
+    {
+        return $this->hasMany(Event::class, 'created_by');
+    }
     // Add any additional methods related to authentication if necessary
 }

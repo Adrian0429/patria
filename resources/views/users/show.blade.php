@@ -43,6 +43,11 @@
             margin-left: 5rem;
             margin-top: 2rem;
         }
+        @media (max-width: 768px) {
+        .header-logo {
+                display: none;
+                }
+        }     
 
         .logo-patria { 
             width: 6rem;
@@ -56,6 +61,11 @@
             color: white;
             font-size: 1.5rem;
             font-family: 'Montserrat', sans-serif;
+        }
+
+        .header-text p {
+            gap: 0;
+            margin: 0;
         }
 
         .header-text .top {
@@ -199,9 +209,9 @@
             </div>
 
             <div>
-                @if (Auth::check() && Auth::user()->user_id == $user->user_id)
+                {{-- @if (Auth::check() && Auth::user()->user_id == $user->user_id)
                 <a href="{{ route('users.edit', $user->user_id) }}" class="btn" style="margin-right: 8px;">Edit Profile</a>
-                @endif
+                @endif --}}
                 <a href="/" class="btn">Kembali</a>  
                 
             </div>
