@@ -185,8 +185,13 @@
             }
         }
 
-        #qr-reader{
-            margin: 0 auto;
+        #qr-reader { 
+            border: none !important; /* Ensure there's absolutely no border */
+            margin: 0.5rem auto;
+            outline: none; /* Remove any focus outline if applicable */
+            box-shadow: none; /* Remove any shadows if applicable */
+            width: 250px;
+            height: auto;
         }
 
     </style>
@@ -206,7 +211,7 @@
             <h1>Selamat Datang Patria!</h1>
             <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
             
-                <div id="qr-reader" style="width:250px"></div>
+                <div id="qr-reader"></div>
                 <div id="qr-reader-results"></div>
 
             <form id="searchForm" method="GET">
