@@ -185,11 +185,8 @@
             }
         }
 
-        #qr-reader { 
-            border: none !important; /* Ensure there's absolutely no border */
+        #qr-reader{
             margin: 0 auto;
-            outline: none; /* Remove any focus outline if applicable */
-            box-shadow: none; /* Remove any shadows if applicable */
         }
 
     </style>
@@ -209,8 +206,8 @@
             <h1>Selamat Datang Patria!</h1>
             <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
             
-            <div id="qr-reader" style="width:200px"></div>
-            <button id="stop-scan" class="btnSubmit">Stop Scanning</button>
+                <div id="qr-reader" style="width:250px"></div>
+                <div id="qr-reader-results"></div>
 
             <form id="searchForm" method="GET">
                 <input type="text" id="userId" name="userId" placeholder="Enter Patria ID or Card ID" required>
@@ -229,50 +226,29 @@
     }
 
     docReady(function () {
-        let lastScannedCode = null;
-        const scanInterval = 500;
-        let lastScannedTime = 0;
-        let qrScanner = null;
+            var resultContainer = document.getElementById('qr-reader-results');
+            var lastResult, countResults = 0;
+            
+            function onScanSuccess(decodedText, decodedResult) {
+                const currentTime = new Date().getTime();
 
-        function onScanSuccess(qrCodeMessage) {
-            const currentTime = new Date().getTime();
+                if (decodedText !== lastResult) {
+                    console.log("Scanned QR Code:", decodedText);
+                    window.open(decodedText, '_blank');
 
-            if (qrCodeMessage !== lastScannedCode || currentTime - lastScannedTime > scanInterval) {
-                console.log("Scanned QR Code:", qrCodeMessage);
-                window.open(qrCodeMessage, '_blank');
-
-                lastScannedCode = qrCodeMessage;
-                lastScannedTime = currentTime;
-            } else {
-                console.log("Duplicate or too frequent scans ignored.");
+                    lastResult = decodedText;
+                } else {
+                    console.log("Duplicate or too frequent scans ignored.");
+                }
             }
-        }
 
-        function initializeScanner() {
-            qrScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: 250 });
-            qrScanner.render(onScanSuccess);
-        }
 
-        function stopScanner() {
-            if (qrScanner) {
-                qrScanner.clear()
-                    .then(() => {
-                        console.log("Scanner stopped and resources cleaned.");
-                    })
-                    .catch((error) => {
-                        console.error("Error while stopping the scanner:", error);
-                    });
-            }
-        }
-
-        initializeScanner();
-
-        // Handle stop scanning button
-        document.getElementById("stop-scan").addEventListener("click", function () {
-            stopScanner();
+            var html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render(onScanSuccess);
         });
 
-        // Handle manual input form submission
+            // Handle manual input form submission
         document.getElementById('searchForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -287,7 +263,6 @@
         window.addEventListener('beforeunload', function () {
             stopScanner();
         });
-    });
 </script>
 
 
