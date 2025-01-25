@@ -79,7 +79,7 @@
         #scanner-container {
             margin: 20px auto;
             width: 100%;
-            max-width: 150px;
+            max-width: 100px;
             height: 20px;
             display: flex;
             border: none !important;
@@ -168,8 +168,8 @@
 
             #scanner-container {
                 width: 90%;
-                height: auto;
-                max-width: 250px;
+                height: 20px;
+                max-width: 100px;
             }
         }
 
