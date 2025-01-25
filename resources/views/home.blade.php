@@ -194,6 +194,14 @@
             height: auto;
         }
 
+        @media (max-width: 480px) {
+            #qr-reader {
+            width: 75%; /* Reduce the width to 75% of the original width on mobile */
+            }
+        }
+
+
+
     </style>
 
 @extends('layouts.app')

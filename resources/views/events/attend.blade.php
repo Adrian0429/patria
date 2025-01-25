@@ -146,6 +146,23 @@
                 padding: 0.75rem;
             }
         }
+        
+        #qr-reader { 
+            border: none !important; /* Ensure there's absolutely no border */
+            margin: 0.5rem auto;
+            outline: none; /* Remove any focus outline if applicable */
+            box-shadow: none; /* Remove any shadows if applicable */
+            width: 250px;
+            height: auto;
+        }
+
+        @media (max-width: 480px) {
+            #qr-reader {
+            width: 75%; /* Reduce the width to 75% of the original width on mobile */
+            }
+        }
+
+
     </style>
 </head>
     @include('partials.navbar')
