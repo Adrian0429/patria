@@ -152,7 +152,7 @@ form {
 <head>
     <title>Html-Qrcode Demo</title>
 <body>
-    <div id="qr-reader" style="width:500px"></div>
+    <div id="qr-reader" style="width:200px"></div>
     <div id="qr-reader-results"></div>
 </body>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>

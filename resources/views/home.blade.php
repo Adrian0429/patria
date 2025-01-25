@@ -18,6 +18,8 @@
             height: calc(100vh - 84px);
         }
 
+
+
         .header-logo{
                 position: absolute;
                 display: flex;
@@ -76,20 +78,6 @@
             font-size: 2rem;
         }
 
-        #scanner-container {
-            margin: 20px auto;
-            width: 100%;
-            max-width: 100px;
-            height: 20px;
-            display: flex;
-            border: none !important;
-            outline: none;
-            box-shadow: none;
-        }
-
-        #html5-qrcode-button-camera-stop {
-            display: none !important;
-        }
 
         input {
             font-family: 'Poppins', sans-serif;
@@ -106,7 +94,7 @@
         button {
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 400;
             width: 100%;
             max-width: 300px;
             background: #3a7bd5;
@@ -196,7 +184,16 @@
                 height: 250px;
             }
         }
+
+        #qr-reader { 
+            border: none !important; /* Ensure there's absolutely no border */
+            margin: 0 auto;
+            outline: none; /* Remove any focus outline if applicable */
+            box-shadow: none; /* Remove any shadows if applicable */
+        }
+
     </style>
+
 @extends('layouts.app')
 @section('content')
     <div class="main-container">
@@ -211,11 +208,8 @@
         <div class="container">
             <h1>Selamat Datang Patria!</h1>
             <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
-
-            <button id="permission-button">Request Camera Permission</button>
-
-            <div id="scanner-container"></div>
-            <button id="switch-camera-button" style="display:none;">Switch Camera</button>
+            
+            <div id="qr-reader" style="width:200px"></div>
 
             <form id="searchForm" method="GET">
                 <input type="text" id="userId" name="userId" placeholder="Enter Patria ID or Card ID" required>
@@ -224,121 +218,67 @@
         </div>
     </div>
 
+<script>
+    function docReady(fn) {
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            setTimeout(fn, 1);
+        } else {
+            document.addEventListener("DOMContentLoaded", fn);
+        }
+    }
 
-    <script>
-        let currentFacingMode = "environment"; // Default to rear camera
-        let html5QrcodeScanner;
+    function docReady(fn) {
+        // see if DOM is already available
+        if (document.readyState === "complete"
+            || document.readyState === "interactive") {
+            // call on next available tick
+            setTimeout(fn, 1);
+        } else {
+            document.addEventListener("DOMContentLoaded", fn);
+        }
+    }
 
-        // Request camera permission and initialize the scanner
-        document.getElementById("permission-button").addEventListener("click", function () {
-            if (!localStorage.getItem("cameraPermissionGranted")) {
-                navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
-                    .then((stream) => {
-                        console.log("Camera permission granted!");
-                        alert("Camera permission granted. You can now start scanning.");
-                        
-                        localStorage.setItem("cameraPermissionGranted", "true");
-
-                        // Stop the stream after permission check
-                        stream.getTracks().forEach((track) => track.stop());
-
-                        // Display scanner and hide the button
-                        document.getElementById("scanner-container").style.display = "block";
-                        document.getElementById("permission-button").style.display = "none";
-
-                        // Initialize QR Code Scanner
-                        html5QrcodeScanner = new Html5QrcodeScanner("scanner-container", { fps: 10, qrbox: 250 }, false);
-                        html5QrcodeScanner.render(onScanSuccess);
-
-                        // Remove the stop scanning button after rendering
-                        const stopButton = document.querySelector(".html5-qrcode-button-stop");
-                        if (stopButton) {
-                            stopButton.parentElement.removeChild(stopButton);
-                        }
-
-                        // Show the camera switch button
-                        document.getElementById("switch-camera-button").style.display = "block";
-                    })
-                    .catch((err) => {
-                        console.error("Camera permission error:", err);
-                        alert("Camera permission denied. Please enable camera access in your browser settings.");
-                    });
-            } else {
-                // If permission is already granted
-                document.getElementById("scanner-container").style.display = "block";
-                document.getElementById("permission-button").style.display = "none";
-
-                // Initialize QR Code Scanner
-                html5QrcodeScanner = new Html5QrcodeScanner("scanner-container", { fps: 10, qrbox: 250 }, false);
-                html5QrcodeScanner.render(onScanSuccess);
-
-                // Remove the stop scanning button after rendering
-                const stopButton = document.querySelector(".html5-qrcode-button-stop");
-                if (stopButton) {
-                    stopButton.parentElement.removeChild(stopButton);
-                }
-
-                // Show the camera switch button
-                document.getElementById("switch-camera-button").style.display = "block";
-            }
-        });
-
-        // Switch camera functionality
-        document.getElementById("switch-camera-button").addEventListener("click", function () {
-            // Stop the current camera stream
-            if (html5QrcodeScanner) {
-                html5QrcodeScanner.clear();
-            }
-
-            // Toggle between user (front) and environment (rear) cameras
-            currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
-
-            // Reinitialize the scanner with the new camera
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode } })
-                .then((stream) => {
-                    console.log(`Switched to ${currentFacingMode} camera.`);
-                    
-                    // Reinitialize QR scanner with the new camera
-                    html5QrcodeScanner = new Html5QrcodeScanner("scanner-container", { fps: 10, qrbox: 250 }, false);
-                    html5QrcodeScanner.render(onScanSuccess);
-
-                    // Remove the stop scanning button after rendering
-                    const stopButton = document.querySelector(".html5-qrcode-button-stop");
-                    if (stopButton) {
-                        stopButton.parentElement.removeChild(stopButton);
-                    }
-                })
-                .catch((err) => {
-                    console.error("Error switching camera:", err);
-                    alert("Unable to switch camera. Please try again.");
-                });
-        });
-
-        let lastOpenedTime = 0;
+    docReady(function () {
+        let lastScannedCode = null; // To avoid scanning the same QR code repeatedly
+        const scanInterval = 500; // Minimum interval between scans in milliseconds
+        let lastScannedTime = 0;
 
         function onScanSuccess(qrCodeMessage) {
             const currentTime = new Date().getTime();
 
-            if (currentTime - lastOpenedTime >= 500) {
+            // Prevent duplicate scans
+            if (qrCodeMessage !== lastScannedCode || currentTime - lastScannedTime > scanInterval) {
                 console.log("Scanned QR Code:", qrCodeMessage);
+
+                // Open the scanned URL in a new tab
                 window.open(qrCodeMessage, '_blank');
 
-                lastOpenedTime = currentTime;
+                lastScannedCode = qrCodeMessage;
+                lastScannedTime = currentTime;
             } else {
-                console.log("Window opening too soon. Please wait 0.5 seconds.");
+                console.log("Duplicate or too frequent scans ignored.");
             }
         }
 
+        var html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+    });
 
-        document.getElementById('searchForm').addEventListener('submit', function (event) {
-            event.preventDefault(); 
+    
 
-            var userId = document.getElementById('userId').value;
+    // Handle manual input form submission
+    document.getElementById('searchForm').addEventListener('submit', function (event) {
+        event.preventDefault();
 
-            var url = '/users/' + userId;
-
+        const userId = document.getElementById('userId').value.trim();
+        if (userId) {
+            const url = `/users/${userId}`;
             window.open(url, '_blank');
-        });
-    </script>
+        }
+    });
+</script>
+
 
 @endsection
+
