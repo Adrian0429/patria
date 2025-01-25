@@ -79,8 +79,8 @@
         #scanner-container {
             margin: 20px auto;
             width: 100%;
-            max-width: 170px;
-            height: 170px;
+            max-width: 150px;
+            height: 20px;
             display: flex;
             border: none !important;
             outline: none;
