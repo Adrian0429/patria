@@ -52,21 +52,6 @@
             font-size: 2.5rem;
         }
 
-        #scanner-container {
-            margin: 0 auto;
-            width: 100%;
-            max-width: 170px;
-            height: 170px;
-            display: flex;
-            border: none !important;
-            outline: none;
-            box-shadow: none;
-        }
-
-        #html5-qrcode-button-camera-stop {
-            display: none !important;
-        }
-
         input {
             font-family: 'Poppins', sans-serif;
             font-size: 1rem;
@@ -141,11 +126,6 @@
                 padding: 0.75rem 1rem;
             }
 
-            #scanner-container {
-                width: 90%;
-                height: auto;
-                max-width: 250px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -165,11 +145,6 @@
                 font-size: 0.9rem;
                 padding: 0.75rem;
             }
-
-            #scanner-container {
-                width: 80%;
-                height: 250px;
-            }
         }
     </style>
 </head>
@@ -181,8 +156,9 @@
             <h1>{{ $event->name }}</h1>
             <p>Scan Kode QR atau Tap Kartu Patria anda!</p>
 
-            <button id="permission-button">Request Camera Permission</button>
-            <div id="scanner-container"></div>
+            <div id="qr-reader"></div>
+            <div id="qr-reader-results"></div>
+
             <form id="searchForm" method="POST" action="{{ route('attendance.record') }}">
                 @csrf
                 <input type="hidden" name="event_id" value="{{ $event->id }}">
@@ -193,79 +169,43 @@
     </div>
 
     <script>
-        document.getElementById("permission-button").addEventListener("click", function () {
-            if (!localStorage.getItem("cameraPermissionGranted")) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then((stream) => {
-                        console.log("Camera permission granted!");
-                        alert("Camera permission granted. You can now start scanning.");
-                        
-                        localStorage.setItem("cameraPermissionGranted", "true");
+       function docReady(fn) {
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            setTimeout(fn, 1);
+        } else {
+            document.addEventListener("DOMContentLoaded", fn);
+        }
+    }
 
-                        // Stop the stream after permission check
-                        stream.getTracks().forEach((track) => track.stop());
+    docReady(function () {
+            var resultContainer = document.getElementById('qr-reader-results');
+            var lastResult, countResults = 0;
+            
+            function onScanSuccess(decodedText, decodedResult) {
+                if (decodedText !== lastResult) {
 
-                        // Display scanner and hide the button
-                        document.getElementById("scanner-container").style.display = "block";
-                        document.getElementById("permission-button").style.display = "none";
+                    const urlParts = decodedText.split("/");
+                    const userId = urlParts[urlParts.length - 1];
 
-                        // Initialize QR Code Scanner
-                        const html5QrcodeScanner = new Html5QrcodeScanner(
-                            "scanner-container", { fps: 10, qrbox: 250 }, false
-                        );
+                    const userIdInput = document.getElementById("userId");
+                    userIdInput.value = userId;
 
-                        html5QrcodeScanner.render(onScanSuccess);
-
-                        const stopButton = document.querySelector(".html5-qrcode-button-stop");
-                        if (stopButton) {
-                            stopButton.parentElement.removeChild(stopButton);
-                        }
-                    })
-                    .catch((err) => {
-                        console.error("Camera permission error:", err);
-                        alert("Camera permission denied. Please enable camera access in your browser settings.");
-                    });
-            } else {
-                document.getElementById("scanner-container").style.display = "block";
-                document.getElementById("permission-button").style.display = "none";
-
-                // Initialize QR Code Scanner
-                const html5QrcodeScanner = new Html5QrcodeScanner(
-                    "scanner-container", { fps: 10, qrbox: 250 }, false
-                );
-
-                html5QrcodeScanner.render(onScanSuccess);
-
-                // Remove the stop scanning button after rendering
-                const stopButton = document.querySelector(".html5-qrcode-button-stop");
-                if (stopButton) {
-                    stopButton.parentElement.removeChild(stopButton);
+                    lastResult = decodedText;
+                } else {
+                    console.log("Duplicate or too frequent scans ignored.");
                 }
             }
+
+
+            var html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader", { fps: 10, qrbox: 250 });
+            html5QrcodeScanner.render(onScanSuccess);
         });
 
-        let lastOpenedTime = 0;
-
-        function onScanSuccess(qrCodeMessage) {
-            const currentTime = new Date().getTime();
-
-            if (currentTime - lastOpenedTime >= 500) {
-                console.log("Scanned QR Code:", qrCodeMessage);
-
-                const urlParts = qrCodeMessage.split("/");
-                const userId = urlParts[urlParts.length - 1];
-
-                const userIdInput = document.getElementById("userId");
-                userIdInput.value = userId;
-
-                const form = document.getElementById("searchForm");
-                form.submit();
-
-                lastOpenedTime = currentTime;
-            } else {
-                console.log("Window opening too soon. Please wait 0.5 seconds.");
-            }
-        }
+        // Clean up scanner when the page is unloaded
+        window.addEventListener('beforeunload', function () {
+            stopScanner();
+        });
 
     </script>
 
