@@ -31,6 +31,10 @@
     word-wrap: break-word; 
 }
 
+.table td {
+    height: 100px;
+}
+
 .table th {
     position: sticky; /* Makes the header sticky */
     top: 0;
@@ -89,14 +93,57 @@
 }
 
 
-/* Buttons */
+/* General Button Styles */
 .btn {
+    display: inline-block;
     padding: 6px 12px;
     font-size: 1rem;
     border-radius: 6px;
+    text-align: center;
     text-decoration: none;
-    min-width: 110px;
+    min-width: 120px; /* Ensure equal width for buttons */
     color: #fff;
+    transition: all 0.3s;
+}
+
+.btn-sm {
+    font-size: 0.85rem;
+    padding: 5px 10px;
+}
+
+/* Button Colors */
+.btn-info {
+    background-color: #17a2b8;
+    border: none;
+}
+
+.btn-info:hover {
+    background-color: #117a8b;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: #d39e00;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #bd2130;
+}
+
+.table td:last-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .btn-primary {
@@ -213,11 +260,6 @@
     background-color: #bd2130;
 }
 
-.user-picture {
-    width: auto;
-    height: 200px;
-    object-fit: cover;
-}
 
 .table td:last-child {
     display: flex;
@@ -248,17 +290,29 @@
 @section('content')
 <div class="main-container">
 
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
         <a href="{{ route('events.createEventForm') }}" class="btn-add-event">Tambahkan Event</a>
-        
+        <form method="GET" action="{{ route('events.index') }}" style="display: flex;">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search by event name" 
+                value="{{ request('search') }}" 
+                class="form-control" 
+                style="flex: 1; max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
+        </form>
+    </div>
+
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Event ID</th>
                         <th>Nama Event</th>
-                        <th>Logo</th>
                         <th>Tanggal Mulai</th>
                         <th>Tanggal Berakhir</th>
+                        <th>Daerah</th>
+                        <th>Pembuat</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -267,15 +321,19 @@
                         <tr>
                             <td>{{ $event->id }}</td>
                             <td>{{ $event->name }}</td>
-                            <td>
-                            <img class="user-picture" src="{{ asset('storage/' . $event->logo) }}"/>
                             <td>{{ $event->start_date }}</td>
                             <td>{{ $event->end_date }}</td>
+                            <td>{{ $event->creator->daerah }}</td>
+                            <td>{{ $event->creator->nama_lengkap }}</td>
                             <td>
-                                <a href="{{ route('events.attend', $event->id) }}" class="btn btn-info btn-sm">Absen</a>
-                                <a href="{{ route('attendance.index', $event->id) }}" class="btn btn-info btn-sm">Daftar Absen</a>
-                                <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('events.delete', $event->id) }}')">Delete</a>
+                                <div style="display: flex; gap: 10px; justify-content: center;">
+                                    <a href="{{ route('events.attend', $event->id) }}" class="btn btn-info btn-sm">Absen</a>
+                                    <a href="{{ route('attendance.index', $event->id) }}" class="btn btn-info btn-sm">Daftar Absen</a>
+                                </div>
+                                <div style="display: flex; gap: 10px; justify-content: center;">
+                                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('events.delete', $event->id) }}')">Delete</a>
+                                </div>                            
                             </td>
                         </tr>
                     @endforeach

@@ -13,11 +13,27 @@ use App\Exports\AttendancesExport;
 class EventAttendanceController extends Controller
 {
 
-
-    public function getEvents()
+    public function getEvents(Request $request)
     {
-        $events = Event::paginate(5);
-        return view('events.index', compact('events'));
+        $user = auth()->user();
+        $search = $request->query('search'); // Capture the search query
+
+        // Initialize the query
+        if ($user->role === 'admin') {
+            $query = Event::query();
+        } else {
+            $query = Event::where('created_by', $user->user_id);
+        }
+
+        // Apply search filter if a search term is provided
+        if ($search) {
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        // Paginate the results
+        $events = $query->paginate(5);
+
+        return view('events.index', compact('events', 'search'));
     }
 
     public function createEventForm()
@@ -39,7 +55,6 @@ class EventAttendanceController extends Controller
             $logoPath = $request->file('logo')->store('logos', 'public');
         }
 
-        // Create the event
         Event::create([
             'name' => $validated['name'],
             'logo' => $logoPath,
@@ -49,6 +64,40 @@ class EventAttendanceController extends Controller
         ]);
 
         return redirect()->route('events.index')->with('success', 'Event created successfully!');
+    }
+
+    public function updateEvent(Request $request, $id)
+    {
+        // Find the event and check if it exists
+        $event = Event::findOrFail($id);
+
+        // Ensure only the creator or an admin can update the event
+        if (auth()->user()->role !== 'admin' && $event->created_by !== auth()->user()->user_id) {
+            return redirect()->route('events.index')->with('error', 'You are not authorized to update this event.');
+        }
+
+        // Validate the input
+        $validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string|max:255',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'start_date' => 'sometimes|required|date',
+            'end_date' => 'sometimes|required|date|after_or_equal:start_date',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        // Prepare the data for updating
+        $data = $request->only('name', 'start_date', 'end_date');
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        // Update the event (created_by is not updated)
+        $event->update($data);
+
+        return redirect()->route('events.index')->with('success', 'Event updated successfully!');
     }
 
     public function getEvent($id)
@@ -61,31 +110,6 @@ class EventAttendanceController extends Controller
     {
         $event = Event::findOrFail($id);
         return view('events.edit', compact('event'));
-    }
-
-    public function updateEvent(Request $request, $id)
-    {
-        $event = Event::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
-            'start_date' => 'sometimes|required|date',
-            'end_date' => 'sometimes|required|date|after_or_equal:start_date',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $data = $request->only('name', 'start_date', 'end_date');
-        if ($request->hasFile('logo')) {
-            $data['logo'] = $request->file('logo')->store('logo', 'public');
-        }
-
-        $event->update($data);
-
-        return redirect()->route('events.index', $id)->with('success', 'Event updated successfully!');
     }
 
     public function deleteEvent($id)
@@ -149,7 +173,6 @@ class EventAttendanceController extends Controller
             return redirect()->back()->with('error', 'Failed to record attendance. Please try again.');
         }
     }
-
 
     public function getAttendance($event_id)
     {

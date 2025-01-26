@@ -128,16 +128,16 @@
                     </div>
                 </div>
                 <div class="row">
-                    @if (Auth::user()->jabatan == 'admin' || Auth::user()->jabatan == 'DPC')
+                    @if (Auth::user()->role == 'admin' || Auth::user()->role == 'DPC')
                     <div class="col-md-6 mb-3">
                         <label for="role" class="form-label">Jabatan</label>
                         <select class="form-select" id="role" name="role">
                             <option value="" disabled>Select Role</option>
-                            <option value="DPP" {{ $user->jabatan == 'DPP' ? 'selected' : '' }}>DPP</option>
-                            <option value="DPD" {{ $user->jabatan == 'DPD' ? 'selected' : '' }}>DPD</option>
-                            <option value="DPC" {{ $user->jabatan == 'DPC' ? 'selected' : '' }}>DPC</option>
-                            <option value="DPAC" {{ $user->jabatan == 'DPAC' ? 'selected' : '' }}>DPAC</option>
-                            <option value="User" {{ $user->jabatan == 'User' ? 'selected' : '' }}>Anggota</option>
+                            <option value="DPP" {{ $user->role == 'DPP' ? 'selected' : '' }}>DPP</option>
+                            <option value="DPD" {{ $user->role == 'DPD' ? 'selected' : '' }}>DPD</option>
+                            <option value="DPC" {{ $user->role == 'DPC' ? 'selected' : '' }}>DPC</option>
+                            <option value="DPAC" {{ $user->role == 'DPAC' ? 'selected' : '' }}>DPAC</option>
+                            <option value="User" {{ $user->role == 'User' ? 'selected' : '' }}>Anggota</option>
                         </select>
                     </div>
                     @endif

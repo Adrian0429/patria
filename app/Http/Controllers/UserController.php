@@ -13,24 +13,47 @@ use Illuminate\Support\Facades\Response;
 
 class UserController extends Controller
 {
-    public function index()
+    
+    public function index(Request $request)
     {
-        if(auth()->user()->role == 'admin') {
-            $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
-        }
-        else if(auth()->user()->role == 'DPP') {
-            $users = User::where('user_id', '!=', 'admin1234')->paginate(10);
-        } else if(auth()->user()->role == 'DPD') {
-            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('daerah', "=", auth()->user()->daerah)->paginate(10);
-        } else if(auth()->user()->role == 'DPC') {
-            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->where('daerah', "=", auth()->user()->daerah)->paginate(10);
-        } else if(auth()->user()->role == 'DPAC') {
-            $users = User::where('user_id', '!=', 'admin1234')->where('role', '!=', 'DPP')->where('role', '!=', 'DPD')->where('role', '!=', 'DPC')->where('daerah', "=", auth()->user()->daerah)->paginate(10); 
-        }else {
+        // Get the search term from the query parameter
+        $search = $request->query('search');
+
+        // Initialize the query
+        $query = User::where('user_id', '!=', 'admin1234');
+
+        if (auth()->user()->role == 'admin' || auth()->user()->role == 'DPP') {
+            // No additional filters needed for admin or DPP
+        } else if (auth()->user()->role == 'DPD') {
+            $query->where('role', '!=', 'DPP')->where('daerah', '=', auth()->user()->daerah);
+        } else if (auth()->user()->role == 'DPC') {
+            $query->where('role', '!=', 'DPP')
+                ->where('role', '!=', 'DPD')
+                ->where('daerah', '=', auth()->user()->daerah);
+        } else if (auth()->user()->role == 'DPAC') {
+            $query->where('role', '!=', 'DPP')
+                ->where('role', '!=', 'DPD')
+                ->where('role', '!=', 'DPC')
+                ->where('daerah', '=', auth()->user()->daerah);
+        } else {
             return view('users.profile');
         }
-        return view('users.home', compact('users'));
+
+        // Apply search filter if a search term is provided
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lengkap', 'LIKE', "%{$search}%")
+                ->orWhere('email', 'LIKE', "%{$search}%")
+                ->orWhere('user_id', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Paginate the results
+        $users = $query->paginate(10);
+
+        return view('users.home', compact('users', 'search'));
     }
+
 
     public function profile()
     {   
@@ -49,84 +72,115 @@ class UserController extends Controller
         return view('users.create'); 
     }
 
-    public function store(Request $request)
+    public function storeCSV(Request $request)
     {
-        if ($request->hasFile('csv_file')) {
-            $request->validate([
-                'csv_file' => 'required|file|mimes:csv,txt',
-            ]);
+        $validated = $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt',
+        ]);
 
-            $file = $request->file('csv_file');
-            $filePath = $file->getRealPath();
-            $rows = array_map('str_getcsv', file($filePath));
+        $file = $request->file('csv_file');
 
-            $header = array_map('trim', $rows[0]);
-            unset($rows[0]);
+        // Open the file for reading
+        $handle = fopen($file->getRealPath(), 'r');
+  
+        $data = [];
+        $isFirstRow = true; // Flag to identify the first row
 
-            $errors = [];
-            $successCount = 0;
-
-            foreach ($rows as $index => $row) {
-                $row = array_combine($header, $row);
-
-                // Validate each row
-                $validator = Validator::make($row, [
-                    'card_id' => 'nullable|string|unique:users,card_id|max:20',
-                    'user_id' => 'required|string|unique:users,user_id|max:20',
-                    'nama_lengkap' => 'required|string|max:255',
-                    'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-                    'tanggal_lahir' => 'required|date',
-                    'golongan_darah' => 'required|string|max:3',
-                    'vihara' => 'required|string|max:255',
-                    'email' => 'required|email|unique:users,email',
-                    'role' => 'required|in:admin,DPP,DPC,Anggota',
-                    'password' => 'required|string|min:8',
-                ]);
-
-                if ($validator->fails()) {
-                    $errors[$index + 1] = $validator->errors()->all();
-                    continue;
-                }
-
-                $validatedData = $validator->validated();
-                $validatedData['password'] = bcrypt($validatedData['password']);
-
-                User::create($validatedData);
-                $successCount++;
+        // Read through the file line by line and use semicolon as delimiter
+        while (($row = fgetcsv($handle, 1000, ';')) !== false) {
+            // Skip the first row (header)
+            if ($isFirstRow) {
+                $isFirstRow = false;
+                continue;
             }
 
-            return redirect()->route('users.home')->with([
-                'success' => "{$successCount} users created successfully.",
-                'error' => count($errors) ? "Some rows failed to import." : null,
-                'import_errors' => $errors,
+            // Skip empty rows
+            if (empty(array_filter($row))) {
+                continue;
+            }
+
+            $data[] = $row;
+        }
+
+        fclose($handle);
+
+        // Process each row from CSV
+        foreach ($data as $row) {
+            User::create([
+                'card_id' => $row[0] ?? null,
+                'user_id' => $row[1],
+                'nama_lengkap' => $row[2],
+                'jenis_kelamin' => $row[3],
+                'tanggal_lahir' => \Carbon\Carbon::createFromFormat('d/m/y', $row[4])->format('Y-m-d'),
+                'golongan_darah' => $row[5],
+                'vihara' => $row[6],
+                'email' => $row[7] ?? null,
+                'role' => $row[8],
+                'password' => bcrypt($row[9]),
+                'daerah' => $row[10],
+                'image_link' => $row[1] . '.png',
             ]);
-        } else {
-            $validatedData = $request->validate([
-                'card_id' => 'nullable|string|unique:users,card_id|max:20',
-                'user_id' => 'required|string|unique:users,user_id|max:20',
+        }
+
+        return redirect()->route('users.home')->with('success', 'Users added successfully via CSV!');
+    }
+
+
+    public function store(Request $request)
+    {
+            // Validate and process manual input
+            $validated = $request->validate([
+                'card_id' => 'nullable|string|max:255',
+                'user_id' => 'required|string|max:255',
                 'nama_lengkap' => 'required|string|max:255',
-                'jenis_kelamin' => 'required|in:Laki-laki,Perempuan',
-                'tanggal_lahir' => 'required|date',
-                'golongan_darah' => 'required|string|max:3',
-                'vihara' => 'required|string|max:255',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg',
-                'email' => 'required|email|unique:users,email',
-                'role' => 'required|in:admin,DPP,DPC,Anggota',
+                'email' => 'required|email|max:255',
                 'password' => 'required|string|min:8',
+                'jenis_kelamin' => 'required|string',
+                'tanggal_lahir' => 'required|date',
+                'golongan_darah' => 'nullable|string',
+                'role' => 'required|string',
+                'vihara' => 'required|string|max:255',
+                'daerah' => 'required|string|max:255',
             ]);
 
             if ($request->hasFile('image')) {
                 $extension = $request->file('image')->getClientOriginalExtension();
-                $imageName = $validatedData['user_id'] . '.' . $extension;
+                $imageName = $validated['user_id'] . '.' . $extension;
 
                 $path = $request->file('image')->storeAs('images', $imageName, 'public');
-                $validatedData['image_link'] = $path;
+                $validated['image_link'] = $path;
+            } else {
+                $validated['image_link'] = 'images/' + $validated['user_id'] + '.png';
             }
 
-            $validatedData['password'] = bcrypt($validatedData['password']);
-            User::create($validatedData);
+            $validated['password'] = bcrypt($validated['password']);
 
-            return redirect()->route('users.home')->with('success', 'User created successfully.');
+            User::create($validated);
+
+            return redirect()->route('users.home')->with('success', 'User added successfully!');
+        
+    }
+
+    public function uploadimage(Request $request)
+    {   
+        $request->validate([
+            'photos.*' => 'required|image|mimes:jpeg,png,jpg', // Validate each image
+        ]);
+
+        $uploadedPaths = [];
+
+        // Check if there are any files to upload
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $file) {
+                // Get the original filename (assuming it's already formatted as userid.extension)
+                $imageName = $file->getClientOriginalName();
+
+                // Save the file in the 'images' directory in public storage
+                $path = $file->storeAs('images', $imageName, 'public');
+
+                // Store the file path
+                $uploadedPaths[] = $path;
+            }
         }
     }
 
@@ -237,25 +291,28 @@ class UserController extends Controller
     public function downloadTemplate()
     {
         $headers = [
-            'card_id', 'user_id', 'nama_lengkap', 'jenis_kelamin', 
-            'tanggal_lahir', 'golongan_darah', 'vihara', 
-            'email', 'role', 'password'
+            'card_id', 'user_id', 'nama_lengkap', 'jenis_kelamin',
+            'tanggal_lahir', 'golongan_darah', 'vihara',
+            'email', 'role', 'password', 'daerah'
         ];
 
+ 
         $exampleRow = [
-            '12345', 'USR001', 'John Doe', 'Laki-laki', 
-            '1990-01-01', 'A', 'Buddhist Temple', 
-            'johndoe@example.com', 'admin', 'password123'
+            '12345', 'USR001', 'John Doe', 'Laki-laki',
+            '1990-01-01', 'A', 'Buddhist Temple',
+            'johndoe@example.com', 'admin', 'password123', 'Jakarta'
         ];
 
-        $csvContent = implode(',', $headers) . "\n" . implode(',', $exampleRow);
+        $csvContent = implode(';', $headers) . "\n" . implode(';', $exampleRow);
 
-        $filename = "user_template.csv";
+        $filename = "template_tambah_anggota.csv";
 
+        // Return the CSV as a download
         return Response::make($csvContent, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=$filename",
         ]);
     }
+
     
 }

@@ -200,8 +200,6 @@
             }
         }
 
-
-
     </style>
 
 @extends('layouts.app')

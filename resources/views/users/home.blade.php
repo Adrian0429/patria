@@ -143,6 +143,7 @@
     color: #fff;
     background-color: #007bff;
     border-radius: 6px;
+    border: none;
     text-decoration: none;
     transition: background-color 0.3s, transform 0.3s;
     max-width: 200px;
@@ -152,6 +153,29 @@
     background-color: #0056b3;
     transform: translateY(-2px); 
 }
+
+
+.btn-add-user-cancel {
+    display: inline-block;
+    margin: 10px 0;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    color: #fff;
+    background-color: #dc3545;
+    border-radius: 6px;
+    border: none;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.3s;
+    max-width: 200px;
+}
+
+.btn-add-user-cancel:hover {
+    background-color: #bd2130;
+    transform: translateY(-2px); 
+}
+
 
 .btn-add-user:focus {
     outline: none;
@@ -218,6 +242,43 @@
 .btn-danger:hover {
     background-color: #bd2130;
 }
+
+.top-button-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Style for the file input */
+#photos {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: border-color 0.3s ease;
+}
+
+#photos:hover {
+    border-color: #4CAF50;
+}
+
+/* Style for the p tag displaying selected file count */
+#fileCount {
+    font-size: 14px;
+    color: #333;
+    margin-top: 5px;
+}
+
+.photo-button {
+    display: flex;
+    justify-content: space-between;
+}   
+
+
+
 </style>
 @extends('layouts.app')
 <!-- Delete Confirmation Modal -->
@@ -235,11 +296,49 @@
         </div>
     </div>
 </div>
+
+<div id="photoModal" class="modal">
+    <div class="modal-content">
+        <h3>Input Profil</h3>
+        <div class="modal-actions">
+            <form id="photoForm" method="POST" enctype="multipart/form-data" action="{{ route('users.uploadimage') }}">
+                @csrf
+                <input type="file" name="photos[]" multiple id="photos" class="form-control" required>
+                <div class="photo-button">
+                    <button type="submit" class="btn-add-user">Submit</button>
+                    <button type="button" id="cancelButtonPhoto" class="btn-add-user-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 @section('content')
 <div class="main-container">
-        <!-- Add button to redirect to the create user page -->
+
+        <div class="top-button-container">
         <a href="{{ route('users.create') }}" class="btn-add-user">Tambahkan Anggota</a>
-        
+
+        <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+        <form method="GET" action="{{ route('users.home') }}" style="display: flex;">
+            <input 
+                type="text" 
+                name="search" 
+                placeholder="Search by name, email, or ID" 
+                value="{{ request('search') }}" 
+                class="form-control" 
+                style="flex: 1; max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
+        </form>
+
+        @if (Auth::user()->role == 'admin' || Auth::user()->role == 'DPC')
+            <a href="#" class="btn-add-user" onclick="openphotoModal('{{ route('users.uploadimage') }}')">Input Foto Profil</a>
+        @endif
+
+        </div>
+
+        </div>
+
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -251,6 +350,7 @@
                         <th>Jenis Kelamin</th>
                         <th>Tanggal Lahir</th>
                         <th>Golongan Darah</th>
+                        <th>Daerah</th>
                         <th>Vihara</th>
                         <th>Role</th>
                         <th>Action</th>
@@ -266,13 +366,13 @@
                             <td>{{ $user->jenis_kelamin }}</td>
                             <td>{{ $user->tanggal_lahir }}</td>
                             <td>{{ $user->golongan_darah }}</td>
+                            <td>{{ $user->daerah }}</td>
                             <td>{{ $user->vihara }}</td>
                             <td>{{ $user->role }}</td>
                             <td>
                                 <a href="{{ route('users.show', $user->user_id) }}" class="btn btn-info btn-sm">View</a>
                                 <a href="{{ route('users.edit', $user->user_id) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('users.destroy', $user->user_id) }}')">Delete</a>
-
                             </td>
                         </tr>
                     @endforeach
@@ -297,8 +397,9 @@
         </nav>
     </div>
     <script>
+
     const deleteModal = document.getElementById('deleteModal');
-    const cancelButton = document.getElementById('cancelButton');
+    const cancelButton = document.getElementById('cancelButtonPhoto');
     const deleteForm = document.getElementById('deleteForm');
 
     function openDeleteModal(actionUrl) {
@@ -314,6 +415,26 @@
     window.addEventListener('click', (event) => {
         if (event.target === deleteModal) {
             deleteModal.style.display = 'none';
+        }
+    });
+
+    const photoModal = document.getElementById('photoModal');
+    const cancelButtonPhoto = document.getElementById('cancelButtonPhoto');
+    const photoForm = document.getElementById('photoForm');
+
+    function openphotoModal(actionUrl) {
+        photoForm.setAttribute('action', actionUrl);
+        photoModal.style.display = 'flex'; // Show the modal
+    }
+
+    cancelButton.addEventListener('click', () => {
+        photoModal.style.display = 'none'; // Hide the modal on cancel
+    });
+
+    // Close modal when clicking outside of it
+    window.addEventListener('click', (event) => {
+        if (event.target === photoModal) {
+            photoModal.style.display = 'none';
         }
     });
 </script>
