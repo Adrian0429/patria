@@ -188,7 +188,8 @@
         #qr-reader { 
             border: none !important; /* Ensure there's absolutely no border */
             margin: 0.5rem auto;
-            width: 200px;
+            width: 250px;
+            height: 250px;
         }
 
     </style>
