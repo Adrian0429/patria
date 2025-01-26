@@ -188,13 +188,7 @@
         #qr-reader { 
             border: none !important; /* Ensure there's absolutely no border */
             margin: 0.5rem auto;
-            width: 250px;
-        }
-
-        @media (max-width: 480px) {
-            #qr-reader {
-            width: 75%; /* Reduce the width to 75% of the original width on mobile */
-            }
+            width: 200px;
         }
 
     </style>
@@ -267,7 +261,6 @@
             }
         });
 
-        // Clean up scanner when the page is unloaded
         window.addEventListener('beforeunload', function () {
             stopScanner();
         });

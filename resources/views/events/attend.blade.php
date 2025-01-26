@@ -150,14 +150,9 @@
         #qr-reader { 
             border: none !important; /* Ensure there's absolutely no border */
             margin: 0.5rem auto;
-            width: 250px;
+            width: 200px;
         }
 
-        @media (max-width: 480px) {
-            #qr-reader {
-            width: 75%; /* Reduce the width to 75% of the original width on mobile */
-            }
-        }
 
 
     </style>
