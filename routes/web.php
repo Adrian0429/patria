@@ -20,7 +20,7 @@ Route::middleware(['auth', 'role:DPC,admin'])->group(function () {
     Route::post('/users/uploadimage', [UserController::class, 'uploadimage'])->name('users.uploadimage');
 });
 
-Route::middleware(['auth', 'role:DPD, DPC, DPAC, DPP,admin'])->group(function () {
+Route::middleware(['auth', 'role:DPD,DPC,DPAC,DPP,admin'])->group(function () {
     // Event Routes
     Route::get('/events', [EventAttendanceController::class, 'getEvents'])->name('events.index');
     Route::get('/events/create', [EventAttendanceController::class, 'createEventForm'])->name('events.createEventForm');
