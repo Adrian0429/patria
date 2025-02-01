@@ -245,13 +245,12 @@
                 }
             }
 
-
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "qr-reader", { fps: 10, qrbox: 250 });
             html5QrcodeScanner.render(onScanSuccess);
         });
 
-            // Handle manual input form submission
+        // Handle manual input form submission
         document.getElementById('searchForm').addEventListener('submit', function (event) {
             event.preventDefault();
 
@@ -261,6 +260,18 @@
                 window.open(url, '_blank');
             }
         });
+
+        // // Add an input listener for auto-submit
+        // document.getElementById('userId').addEventListener('input', function () {
+        //     const userId = this.value.trim();
+
+        //     // Check if the input contains letters (A-Z or a-z)
+        //     const hasLetters = /[a-zA-Z]/.test(userId);
+
+        //     if ((hasLetters && userId.length === 8) || (!hasLetters && userId.length === 10)) {
+        //         document.getElementById('searchForm').submit();
+        //     }
+        // });
 
         window.addEventListener('beforeunload', function () {
             stopScanner();

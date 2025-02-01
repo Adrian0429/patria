@@ -231,6 +231,7 @@ class UserController extends Controller
                 'tanggal_lahir' => 'nullable|date',
                 'golongan_darah' => 'nullable|string|max:3',
                 'vihara' => 'nullable|string|max:255',
+                'daerah' => 'required|string|max:255',
                 'image' => 'nullable|image|mimes:jpeg,png,jpg',
                 'email' => 'nullable|email|unique:users,email,' . $id . ',user_id',
                 'role' => 'nullable|in:admin,DPP,DPC,Anggota',

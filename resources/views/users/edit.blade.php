@@ -142,21 +142,34 @@
                     </div>
                     @endif
 
-                    <div class="mb-3 col-md-6 ">
-                        <label for="image" class="form-label">Profile Image</label>
-                        <input type="file" class="form-control" id="image" name="image">
-                        @if($user->image_link)
-                        <p class="mt-3">Current Image:</p>
-                        <img class="rounded-2" src="{{ asset('storage/' . $user->image_link) }}" alt="Profile Image" width="150">
-                        @endif
-                    </div>
-                
                     <div class="col-md-6 mb-3">
                         <label for="vihara" class="form-label">Vihara</label>
                         <input type="text" class="form-control" id="vihara" name="vihara" value="{{ $user->vihara }}">
                     </div>
                 </div>
-                
+
+                <div class="col-md-6 mb-3">
+                    <label for="daerah" class="form-label">Daerah</label>
+                    <select class="form-select" id="daerah" name="daerah" required>
+                        <option value="" disabled selected>Pilih Daerah</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 col-md-6">
+                    <label for="image" class="form-label">Profile Image</label>
+                    <input 
+                        type="file" 
+                        class="form-control" 
+                        id="image" 
+                        name="image" 
+                        accept="image/*" 
+                        onchange="previewImage(event)">
+                    
+                    @if($user->image_link)
+                        <p class="mt-3">Current Image:</p>
+                        <img id="imagePreview" class="rounded-2" src="{{ asset('storage/' . $user->image_link) }}" alt="Profile Image" width="150">
+                    @endif
+                </div>
 
                 <button type="submit" class="btn btn-primary w-100">Save</button>
             </form>
@@ -178,6 +191,23 @@
                 @endforeach
             @endif
         });
+
+        function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('imagePreview');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result; // Set the preview image source
+                preview.style.display = 'block'; // Show the preview image
+            };
+            
+            reader.readAsDataURL(input.files[0]); // Read the file as a data URL
+        }
+    }
+
     </script>
 </body>
 </html>

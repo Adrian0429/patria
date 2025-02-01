@@ -155,7 +155,6 @@
         }
 
 
-
     </style>
 </head>
     @include('partials.navbar')
@@ -205,7 +204,6 @@
                     console.log("Duplicate or too frequent scans ignored.");
                 }
             }
-
 
             var html5QrcodeScanner = new Html5QrcodeScanner(
                 "qr-reader", { fps: 10, qrbox: 250 });

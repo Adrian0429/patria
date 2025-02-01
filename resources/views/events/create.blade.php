@@ -70,9 +70,9 @@
         <label for="name">Event Name:</label>
         <input type="text" name="name" id="name" placeholder="Enter Event Name" required>
 
-        <label for="logo">Event Logo:</label>
+        {{-- <label for="logo">Event Logo:</label>
         <input type="file" name="logo" id="logo" accept="image/*" onchange="previewLogo(event)">
-        <img id="logo-preview" src="#" alt="Logo Preview">
+        <img id="logo-preview" src="#" alt="Logo Preview"> --}}
 
         <label for="start_date">Start Date:</label>
         <input type="date" name="start_date" id="start_date" required>
