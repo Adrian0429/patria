@@ -33,5 +33,4 @@ class LoginController extends Controller
 
         return redirect()->route('home'); // Redirect to the login page
     }
-
 }

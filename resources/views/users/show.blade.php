@@ -89,8 +89,8 @@
         }
 
         .user-picture {
-            width: auto;
-            height: 100%;
+            width: 100%;
+            height: auto;
             background-size: contain; 
             background-repeat: no-repeat;
             background-position: center;
