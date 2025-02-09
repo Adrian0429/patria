@@ -9,7 +9,7 @@ class DPD extends Model
 {
     use HasFactory;
 
-    protected $table = 'DPD';
+    protected $table = 'dpd';
 
     protected $fillable = [
         'nama_dpd', 'kode_daerah'
