@@ -25,6 +25,7 @@
 
 }
 
+
 .table th, .table td {
     padding: 6px 7px;
     border-bottom: 1px solid #ddd;
@@ -271,6 +272,41 @@
     color: white;
 }
 
+
+/* Update the status badge styles */
+.status-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Table cell specific styling for status badge */
+.table td.status-badge {
+
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.text-status {
+    padding: 4px 8px;
+    border-radius: 20px;
+    text-transform: capitalize;
+}
+
+.status-sudah {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-belum {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+
 /* Modal animation */
 @keyframes fadeIn {
     from {
@@ -335,7 +371,12 @@
     justify-content: space-between;
 }   
 
-
+.search-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
 
 </style>
 @extends('layouts.app')
@@ -344,13 +385,18 @@
 <div class="main-container">
 
     <div class="top-button-container">
-        <button class="btn-add-user" onclick="openUserModal()">Tambahkan Anggota</button>
+        <a href="{{ route('anggota.create') }}" class="btn-add-user">Tambahkan Anggota</a>
         
-        <form method="GET" action="{{ route('users.home') }}" style="margin: auto 0px;">
-            <input type="text" name="search" placeholder="Cari berdasarkan nama atau email"
-            value="{{ request('search') }}" class="form-control" 
-            style="max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
-        </form>
+        <div class="search-container">  
+            <a href="{{ route('download.csv') }}" class="btn-add-user">Download CSV</a>
+
+            <form method="GET" action="{{ route('anggota.home') }}" style="margin: auto 0px;">
+                <input type="text" name="search" placeholder="Cari berdasarkan nama atau email"
+                value="{{ request('search') }}" class="form-control" 
+                style="max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
+            </form>
+        </div>
+        
     </div>
 
     <div class="table-responsive">
@@ -358,24 +404,27 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nama Akun</th>
+                    <th>ID Kartu</th>
+                    <th>Nama</th>
                     <th>Email</th>
-                    <th>Jabatan Akun</th>
+                    <th>NomorHP</th>
+                    <th>Kartu</th>
                     <th>Cabang/Daerah</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($users as $user)
+                @foreach ($anggotas as $anggota)
                     <tr>
-                        <td>{{ $user->id }}</td>
-                        <td>{{ $user->nama }}</td>
-                        <td>{{ $user->email }}</td>
-                        <td>{{ $user->jabatan }}</td>
-                        <td>{{ $user->nama_dpd ?? $user->nama_dpc }}</td>
+                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->id }}</td>
+                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->ID_Kartu }}</td>
+                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->Nama_Lengkap }}</td>
+                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->Email }}</td>
+                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->No_HP }}</td>
+                        <td class="status-badge" onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'"><p class="text-status {{ $anggota->Status_Kartu == 'sudah_cetak' ? 'status-sudah' : 'status-belum' }}">{{ str_replace('_', ' ', ucfirst($anggota->Status_Kartu)) }}</p></td>
+                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->nama_dpd ?? $anggota->nama_dpc }}</td>
                         <td>
-                            <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})">Edit</button>
-                            <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('users.destroy', $user->id) }}')">Delete</button>
+                            <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('anggota.destroy', $anggota->id) }}')">Delete</button>
                         </td>
                     </tr>
                 @endforeach
@@ -385,81 +434,20 @@
 
     <nav aria-label="Page navigation">
         <ul class="pagination justify-content-center">
-            <li class="page-item {{ $users->onFirstPage() ? 'disabled' : '' }}">
-                <a class="page-link" href="{{ $users->previousPageUrl() }}">Previous</a>
+            <li class="page-item {{ $anggotas->onFirstPage() ? 'disabled' : '' }}">
+                <a class="page-link" href="{{ $anggotas->previousPageUrl() }}">Previous</a>
             </li>
-            @foreach ($users->getUrlRange(1, $users->lastPage()) as $page => $url)
-                <li class="page-item {{ $page == $users->currentPage() ? 'active' : '' }}">
+            @foreach ($anggotas->getUrlRange(1, $anggotas->lastPage()) as $page => $url)
+                <li class="page-item {{ $page == $anggotas->currentPage() ? 'active' : '' }}">
                     <a class="page-link" href="{{ $url }}">{{ $page }}</a>
                 </li>
             @endforeach
-            <li class="page-item {{ $users->hasMorePages() ? '' : 'disabled' }}">
-                <a class="page-link" href="{{ $users->nextPageUrl() }}">Next</a>
+            <li class="page-item {{ $anggotas->hasMorePages() ? '' : 'disabled' }}">
+                <a class="page-link" href="{{ $anggotas->nextPageUrl() }}">Next</a>
             </li>
         </ul>
     </nav>
 </div>
-
-<!-- User Form Modal -->
-<div id="userModal" class="modal">
-    <div class="modal-content">
-        <h3 id="modalTitle">Tambah Anggota</h3>
-        <form id="userForm" method="POST">
-            @csrf
-            <input type="hidden" id="userId" name="id">
-            <div id="methodField"></div> <!-- Placeholder for method override -->
-
-            <div class="form-group">
-                <label for="nama">Nama Akun:</label>
-                <input type="text" id="nama" name="nama" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Akun:</label>
-                <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label for="jabatan">Jabatan:</label>
-                <select id="jabatan" name="jabatan" class="form-control" required>
-                    <option value="admin">Admin</option>
-                    <option value="DPP">DPP</option>
-                    <option value="DPD">DPD</option>
-                    <option value="DPC">DPC</option>
-                    <option value="DPAC">DPAC</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="dpd_id">Cabang/Daerah:</label>
-                <select id="dpd_id" name="dpd_id" class="form-control">
-                    <option value="">-- Pilih DPD --</option>
-                    @foreach($dpds as $dpd)
-                        <option value="{{ $dpd->id }}">{{ $dpd->nama_dpd }}</option>
-                    @endforeach
-                </select>
-
-                <select id="dpc_id" name="dpc_id" class="form-control" style="margin-top: 12px;">
-                    <option value="">-- Pilih DPC --</option>
-                    @foreach($dpcs as $dpc)
-                        <option value="{{ $dpc->id }}">{{ $dpc->nama_dpc }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="modal-actions">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal">
@@ -478,43 +466,33 @@
 </div>
 
 <script>
-   const userModal = document.getElementById('userModal');
     const deleteModal = document.getElementById('deleteModal');
-    const userForm = document.getElementById('userForm');
-    const deleteForm = document.getElementById('deleteForm');
-
-    function openUserModal() {
-        document.getElementById('modalTitle').innerText = 'Tambahkan Anggota';
-        userForm.setAttribute('action', "{{ route('users.store') }}");
-        userForm.reset();
-        userModal.style.display = 'flex';
-    }
-
-    function openEditModal(user) {
-        document.getElementById('modalTitle').innerText = 'Edit Anggota';
-        userForm.setAttribute('action', `/users/edit/${user.id}`);
-        document.getElementById('userId').value = user.id;
-        document.getElementById('nama').value = user.nama;
-        document.getElementById('email').value = user.email;
-        document.getElementById('jabatan').value = user.jabatan;
-        document.getElementById('dpd_id').value = user.dpd_id;
-        document.getElementById('dpc_id').value = user.dpc_id;
-        userModal.style.display = 'flex';
-    }
-
-    function openDeleteModal(actionUrl) {
-        deleteForm.setAttribute('action', actionUrl);
-        deleteModal.style.display = 'flex';
-    }
 
     function closeModal() {
         userModal.style.display = 'none';
         deleteModal.style.display = 'none';
     }
 
+document.addEventListener('DOMContentLoaded', function () {
+    const deleteModal = document.getElementById('deleteModal');
+    const cancelDelete = document.getElementById('cancelDelete');
 
+    function closeModal() {
+        if (deleteModal) deleteModal.style.display = 'none';
+    }
 
-    document.getElementById('cancelDelete').addEventListener('click', closeModal);
+    if (cancelDelete) {
+        cancelDelete.addEventListener('click', closeModal);
+    }
+
+    // Close modal when clicking outside of the content
+    deleteModal.addEventListener('click', function (event) {
+        if (event.target === deleteModal) {
+            closeModal();
+        }
+    });
+});
+
 </script>
 
 @endsection

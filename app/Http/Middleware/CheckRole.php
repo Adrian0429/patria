@@ -14,7 +14,7 @@ class CheckRole
             return redirect()->route('login');
         }
 
-        $userRole = Auth::user()->role;
+        $userRole = Auth::user()->jabatan;
 
         if (!in_array($userRole, $roles)) {
             return redirect()->route('home')->with('error', 'You do not have access to this page.');

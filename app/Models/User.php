@@ -2,42 +2,40 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable; // Add this import
-use Illuminate\Notifications\Notifiable; // Add this import
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable // Change from Model to Authenticatable
+class User extends Authenticatable
 {
-    use HasFactory, Notifiable; // Use Notifiable trait for notifications
-
-    protected $primaryKey = 'user_id'; // Specify the primary key
-    public $incrementing = false; // Disable auto-incrementing since it's not an integer
-    protected $keyType = 'string'; // Set the primary key type to string
+    use HasFactory, Notifiable;
 
     protected $fillable = [
-        'user_id',
-        'card_id',
-        'email',
-        'password',
-        'nama_lengkap',
-        'jenis_kelamin',
-        'tanggal_lahir',
-        'golongan_darah',
-        'vihara',
-        'image_link',
-        'role',
-        'daerah',
+        'nama', 'jabatan', 'email', 'password', 'dpd_id', 'dpc_id',
     ];
 
-    public function attendances()
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
+    public function dpd()
     {
-        return $this->hasMany(Attendance::class);
+        return $this->hasOne(DPD::class, 'dpd_id', 'id')->withDefault();
     }
 
-    public function createdEvents()
+    public function dpc()
     {
-        return $this->hasMany(Event::class, 'created_by');
+        return $this->hasOne(DPC::class, 'dpc_id', 'id')->withDefault();
     }
-    // Add any additional methods related to authentication if necessary
+
+    public function dataAnggota()
+    {
+        return $this->hasMany(DataAnggota::class, 'created_by', 'user_id');
+    }
+
+    public function informasiAkses()
+    {
+        return $this->hasMany(InformasiAkses::class, 'user_id', 'user_id');
+    }
 }

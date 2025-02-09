@@ -5,13 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Event extends Model
+class DPD extends Model
 {
     use HasFactory;
 
-    protected $table = 'event';
+    protected $table = 'DPD';
 
     protected $fillable = [
-        'Nama_Event', 'Start_Date', 'End_Date'
+        'nama_dpd', 'kode_daerah'
     ];
+
+    public function dpc()
+    {
+        return $this->hasMany(DPC::class, 'dpd_id', 'id');
+    }
 }

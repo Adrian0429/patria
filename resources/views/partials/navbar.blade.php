@@ -217,9 +217,12 @@
         </div>
 
         <div class="links">
-            <a href="/">Home</a>
+            <a href="/">Show</a>
             @if (Auth::check() && Auth::User()->role != 'Anggota')
-                <a href="/users">Anggota</a>
+                <a href="/users">Akun</a>
+                <a href="/anggota">Anggota</a>
+                <a href="/dpd">List DPD</a>
+                <a href="/dpc">List DPC</a>
                 <a href="/events">Event</a>
             @endif
         </div>
@@ -228,9 +231,8 @@
 
     @if (Auth::check())
         <div class="dropdown">
-            <button class="dropdown-button">{{ Auth::User()->nama_lengkap }}</button>
+            <button class="dropdown-button">{{ Auth::user()->nama }}</button>
             <div class="dropdown-menu">
-                <button class="button-profile"><a href="{{ route('profile') }}" >Profile</a></button>
                 <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button class="button-logout" type="submit">Logout</button>
@@ -252,11 +254,13 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="/">Home</a>
         @if (Auth::check() && Auth::User()->role != 'Anggota')
-            <a href="/users">Anggota</a>
-            <a href="/events">Event</a>
+                <a href="/users">Akun</a>
+                <a href="/anggota">Anggota</a>
+                <a href="/dpd">List DPD</a>
+                <a href="/dpc">List DPC</a>
+                <a href="/events">Event</a>
         @endif
         @if (Auth::check())
-            <a href="{{ route('profile') }}">Profile</a>
             <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                 @csrf
                 <button type="submit" style="background: none; border: none; color: white;">Logout</button>

@@ -1,319 +1,198 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\DPD;
+use App\Models\DPC;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    
-    public function index(Request $request)
-    {
-        // Get the search term from the query parameter
-        $search = $request->query('search');
 
-        // Initialize the query
-        $query = User::where('user_id', '!=', 'admin1234');
-
-        if (auth()->user()->role == 'admin' || auth()->user()->role == 'DPP') {
-            // No additional filters needed for admin or DPP
-        } else if (auth()->user()->role == 'DPD') {
-            $query->where('role', '!=', 'DPP')->where('daerah', '=', auth()->user()->daerah);
-        } else if (auth()->user()->role == 'DPC') {
-            $query->where('role', '!=', 'DPP')
-                ->where('role', '!=', 'DPD')
-                ->where('daerah', '=', auth()->user()->daerah);
-        } else if (auth()->user()->role == 'DPAC') {
-            $query->where('role', '!=', 'DPP')
-                ->where('role', '!=', 'DPD')
-                ->where('role', '!=', 'DPC')
-                ->where('daerah', '=', auth()->user()->daerah);
-        } else {
-            return view('users.profile');
-        }
-
-        // Apply search filter if a search term is provided
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_lengkap', 'LIKE', "%{$search}%")
-                ->orWhere('email', 'LIKE', "%{$search}%")
-                ->orWhere('user_id', 'LIKE', "%{$search}%");
-            });
-        }
-
-        // Paginate the results
-        $users = $query->paginate(10);
-
-        return view('users.home', compact('users', 'search'));
-    }
-
-
-    public function profile()
+    public function index_dpd(Request $request)
     {   
-        if (!auth()->check() || auth()->user()->user_id === null) {
-            return redirect()->route('login');
-        }
+        $search = $request->input('search');
 
-        $id = auth()->user()->user_id;
-        $user = User::findOrFail($id);
-
-        return view('users.show', compact('user'));
+        $dpds = 
+        DPD::query()->when($search, function ($query, $search) {
+                        return $query->where('nama_dpd', 'like', "%{$search}%");
+                    })->paginate(10);
+        
+        // Pass the users with their DPD and DPC information to the view
+        return view('users.dpd', compact('dpds'));
     }
 
-    public function create()
+    public function store_dpd(Request $request)
     {
-        return view('users.create'); 
-    }
-
-    public function storeCSV(Request $request)
-    {
-        $validated = $request->validate([
-            'csv_file' => 'required|file|mimes:csv,txt',
+        $request->validate([
+            'nama_dpd' => 'required|string|max:255',
+            'kode_daerah' => 'required|string|max:50',
         ]);
 
-        $file = $request->file('csv_file');
-
-        // Open the file for reading
-        $handle = fopen($file->getRealPath(), 'r');
-  
-        $data = [];
-        $isFirstRow = true; // Flag to identify the first row
-
-        // Read through the file line by line and use semicolon as delimiter
-        while (($row = fgetcsv($handle, 1000, ';')) !== false) {
-            // Skip the first row (header)
-            if ($isFirstRow) {
-                $isFirstRow = false;
-                continue;
-            }
-
-            // Skip empty rows
-            if (empty(array_filter($row))) {
-                continue;
-            }
-
-            $data[] = $row;
-        }
-
-        fclose($handle);
-
-        // Process each row from CSV
-        foreach ($data as $row) {
-            User::create([
-                'card_id' => $row[0] ?? null,
-                'user_id' => $row[1],
-                'nama_lengkap' => $row[2],
-                'jenis_kelamin' => $row[3],
-                'tanggal_lahir' => \Carbon\Carbon::createFromFormat('d/m/y', $row[4])->format('Y-m-d'),
-                'golongan_darah' => $row[5],
-                'vihara' => $row[6],
-                'email' => $row[7] ?? null,
-                'role' => $row[8],
-                'password' => bcrypt($row[9]),
-                'daerah' => $row[10],
-                'image_link' => $row[1] . '.png',
-            ]);
-        }
-
-        return redirect()->route('users.home')->with('success', 'Users added successfully via CSV!');
+        DPD::create($request->all());
+        return redirect()->route('users.index_dpd')->with('success', 'DPD berhasil ditambahkan.');
     }
 
+    /**
+     * Update the specified DPP in storage.
+     */
+    public function update_dpd(Request $request, $id)
+    {
+        $request->validate([
+            'nama_dpd' => 'required|string|max:255',
+            'kode_daerah' => 'required|string|max:50',
+        ]);
+
+        $dpp = DPD::findOrFail($id);
+        $dpp->update($request->all());
+
+        return redirect()->route('users.index_dpd')->with('success', 'DPD berhasil dirubah.');
+    }
+
+    /**
+     * Remove the specified DPP from storage.
+     */
+    public function destroy_dpd($id)
+    {
+        $dpp = DPD::findOrFail($id);
+        $dpp->delete();
+
+        return redirect()->route('users.index_dpd')->with('success', 'DPC berhasil dihapus.');
+    }
+
+    public function index_dpc(Request $request)
+    {
+        $search = $request->input('search');
+
+        $dpcs = DPC::leftJoin('dpd', 'dpc.dpd_id', '=', 'dpd.id')
+                    ->select('dpc.*', 'dpd.id as dpd_id', 'dpd.nama_dpd')
+                    ->when($search, function ($query, $search) {
+                        return $query->where('nama_dpc', 'like', "%{$search}%");
+                    })
+                    ->paginate(10);
+        $dpds = DPD::all(); 
+
+        return view('users.dpc', compact('dpcs', 'dpds'));
+    }
+
+    public function store_dpc(Request $request)
+    {
+
+        $request->validate([
+            'dpd_id' => 'required|exists:dpd,id', // Ensure dpd_id exists
+            'nama_dpc' => 'required|string|max:255',
+            'kode_daerah' => 'required|string|max:50',
+        ]);
+
+        DPC::create($request->all());
+
+        return redirect()->route('users.index_dpc')->with('success', 'DPC berhasil ditambahkan.');
+    }
+
+        /**
+     * Update the specified DPC in storage.
+     */
+    public function update_dpc(Request $request, $id)
+    {
+        $request->validate([
+            'dpd_id' => 'required|exists:dpd,id',
+            'nama_dpc' => 'required|string|max:255',
+            'kode_daerah' => 'required|string|max:50',
+        ]);
+
+        $dpc = DPC::findOrFail($id);
+        $dpc->update($request->all());
+
+        return redirect()->route('users.index_dpc')->with('success', 'DPC berhasil diperbarui.');
+    }
+
+    public function destroy_dpc($id)
+    {
+        $dpc = DPC::findOrFail($id);
+        $dpc->delete();
+
+        return redirect()->route('users.index_dpc')->with('success', 'DPC berhasil dihapus.');
+    }
+
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+
+        // Join the User model with DPD and DPC based on dpd_id or dpc_id
+        $users = User::leftJoin('dpd', 'users.dpd_id', '=', 'dpd.id')
+                    ->leftJoin('dpc', 'users.dpc_id', '=', 'dpc.id')
+                    ->select('users.*', 'dpd.nama_dpd', 'dpc.nama_dpc')  // Add necessary columns
+                    ->when($search, function ($query, $search) {
+                        return $query->where('users.nama', 'like', "%{$search}%")
+                                     ->orWhere('users.email', 'like', "%{$search}%");
+                    })
+                    ->paginate(10);
+
+        // Fetch all DPDs to pass to the view
+        $dpds = DPD::all();
+        $dpcs = DPC::all();
+        // Pass the users with their DPD and DPC information to the view
+        return view('users.home', compact('users', 'dpds', 'dpcs', 'search'));
+    }
 
     public function store(Request $request)
     {
-            // Validate and process manual input
-            $validated = $request->validate([
-                'card_id' => 'nullable|string|max:255',
-                'user_id' => 'required|string|max:255',
-                'nama_lengkap' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'password' => 'required|string|min:8',
-                'jenis_kelamin' => 'required|string',
-                'tanggal_lahir' => 'required|date',
-                'golongan_darah' => 'nullable|string',
-                'role' => 'required|string',
-                'vihara' => 'required|string|max:255',
-                'daerah' => 'required|string|max:255',
-            ]);
-
-            if ($request->hasFile('image')) {
-                $extension = $request->file('image')->getClientOriginalExtension();
-                $imageName = $validated['user_id'] . '.' . $extension;
-
-                $path = $request->file('image')->storeAs('images', $imageName, 'public');
-                $validated['image_link'] = $path;
-            } else {
-                $validated['image_link'] = 'images/' + $validated['user_id'] + '.png';
-            }
-
-            $validated['password'] = bcrypt($validated['password']);
-
-            User::create($validated);
-
-            return redirect()->route('users.home')->with('success', 'User added successfully!');
-        
-    }
-
-    public function uploadimage(Request $request)
-    {   
         $request->validate([
-            'photos.*' => 'required|image|mimes:jpeg,png,jpg', // Validate each image
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+            'jabatan' => 'required|in:admin,DPC,DPD',
+            'dpd_id' => 'nullable|exists:dpd,id',
+            'dpc_id' => 'nullable|exists:dpc,id',
         ]);
 
-        $uploadedPaths = [];
-
-        // Check if there are any files to upload
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $file) {
-                // Get the original filename (assuming it's already formatted as userid.extension)
-                $imageName = $file->getClientOriginalName();
-
-                // Save the file in the 'images' directory in public storage
-                $path = $file->storeAs('images', $imageName, 'public');
-
-                // Store the file path
-                $uploadedPaths[] = $path;
-            }
-        }
-    }
-
-    public function show($idOrCardId)
-    {
-        try {
-            $user = User::where('user_id', $idOrCardId)
-                        ->orWhere('card_id', $idOrCardId)
-                        ->firstOrFail();
-
-            return view('users.show', compact('user'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return redirect()->back()->with('error', 'User not found. Please try again.');
-        }
-    }
-
-
-    public function search(Request $request)
-    {
-        $validatedData = $request->validate([
-            'userId' => 'required|integer|exists:users,user_id',
+        User::create([
+            'nama' => $request->nama,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'jabatan' => $request->jabatan,
+            'dpd_id' => $request->dpd_id,
+            'dpc_id' => $request->dpc_id,
         ]);
 
-        return redirect()->route('users.show', $validatedData['userId']);
+        return redirect()->route('users.home')->with('success', 'User created successfully.');
     }
 
-    public function edit($id)
-    {   
-        if (Auth::user()->user_id != $id && Auth::user()->role == 'Anggota') {
-            return redirect()->back()->with('error', 'You do not have permission to access this page.');
-        }
-
-        $user = User::findOrFail($id);
-        // dd($user);
-        return view('users.edit', compact('user'));
-    }
-
+    // Update user details
     public function update(Request $request, $id)
     {
-        try {
-            $user = User::findOrFail($id);
+        $user = User::findOrFail($id);
 
-            $validatedData = $request->validate([
-                'card_id' => 'nullable|string|max:20',
-                'user_id' => 'nullable|string|max:20',
-                'nama_lengkap' => 'nullable|string|max:255',
-                'jenis_kelamin' => 'nullable|in:Laki-laki,Perempuan',
-                'tanggal_lahir' => 'nullable|date',
-                'golongan_darah' => 'nullable|string|max:3',
-                'vihara' => 'nullable|string|max:255',
-                'daerah' => 'required|string|max:255',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg',
-                'email' => 'nullable|email|unique:users,email,' . $id . ',user_id',
-                'role' => 'nullable|in:admin,DPP,DPC,Anggota',
-                'password' => 'nullable|string',
-            ]);
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => "required|email|unique:users,email,{$id}",
+            'password' => 'nullable|min:6',
+            'jabatan' => 'required|in:admin,DPC,DPD',
+            'dpd_id' => 'nullable|exists:dpd,id',
+            'dpc_id' => 'nullable|exists:dpc,id',
+        ]);
 
-            if ($request->hasFile('image')) {
-                // Delete the old image if exists
-                if ($user->image_link) {
-                    Storage::disk('public')->delete($user->image_link);
-                }
+        $user->update([
+            'nama' => $request->nama,
+            'email' => $request->email,
+            'password' => $request->password ? Hash::make($request->password) : $user->password,
+            'jabatan' => $request->jabatan,
+            'dpd_id' => $request->dpd_id,
+            'dpc_id' => $request->dpc_id,
+        ]);
 
-                $extension = $request->file('image')->getClientOriginalExtension(); 
-                $imageName = $user->user_id . '.' . $extension;
-
-                $path = $request->file('image')->storeAs('images', $imageName, 'public');
-                $validatedData['image_link'] = $path;
-            }
-
-            if ($request->filled('password')) {
-                $validatedData['password'] = bcrypt($request->input('password'));
-            }
-
-            // Filter out null values
-            $filteredData = array_filter($validatedData, function ($value) {
-                return $value !== null;
-            });
-
-            $user->update($filteredData);
-
-            return redirect()->route('users.home')->with('success', 'User updated successfully.');
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return redirect()->back()->with('error', 'User not found.');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()->back()
-                ->withErrors($e->validator)
-                ->withInput()
-                ->with('error', 'Validation failed. Please check your input.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'An unexpected error occurred: ' . $e->getMessage());
-        }
+        return redirect()->route('users.home')->with('success', 'User updated successfully.');
     }
 
     public function destroy($id)
     {
         $user = User::findOrFail($id);
-
-        if ($user->image_link) {
-            Storage::disk('public')->delete($user->image_link);
-        }
-
         $user->delete();
 
         return redirect()->route('users.home')->with('success', 'User deleted successfully.');
     }
-
-    public function downloadTemplate()
-    {
-        $headers = [
-            'card_id', 'user_id', 'nama_lengkap', 'jenis_kelamin',
-            'tanggal_lahir', 'golongan_darah', 'vihara',
-            'email', 'role', 'password', 'daerah'
-        ];
-
- 
-        $exampleRow = [
-            '12345', 'USR001', 'John Doe', 'Laki-laki',
-            '1990-01-01', 'A', 'Buddhist Temple',
-            'johndoe@example.com', 'admin', 'password123', 'Jakarta'
-        ];
-
-        $csvContent = implode(';', $headers) . "\n" . implode(';', $exampleRow);
-
-        $filename = "template_tambah_anggota.csv";
-
-        // Return the CSV as a download
-        return Response::make($csvContent, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => "attachment; filename=$filename",
-        ]);
-    }
-
-    
 }

@@ -9,15 +9,19 @@ class Attendance extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['event_id', 'user_id', 'attendance_date'];
+    protected $table = 'attendances';
+
+    protected $fillable = [
+        'event_id', 'user_id', 'attendance_date'
+    ];
 
     public function event()
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Event::class, 'event_id', 'id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }
