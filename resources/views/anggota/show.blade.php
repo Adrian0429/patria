@@ -193,25 +193,22 @@
             </div>
         </div>
         <div class="user-picture-container">
-            @if($user->image_link)
-            <img class="user-picture" src="{{ asset('storage/' . $user->image_link) }}"/>
+            @if($anggota->image_link)
+            <img class="user-picture" src="{{ asset('storage/' . $anggota->image_link) }}"/>
             @endif
         </div>
 
         <div class="info">
             <div>
-            <h1><strong>Hai, saya <br> {{ $user->nama_lengkap }} !</strong></h1>
-            <p><strong>Email: </strong>{{ $user->email }}</p>
-            <p><strong>Jenis Kelamin:</strong> {{ $user->jenis_kelamin }}</p>
-            <p><strong>Tanggal Lahir:</strong> {{ $user->tanggal_lahir }}</p>
-            <p><strong>Golongan Darah:</strong> {{ $user->golongan_darah }}</p>
-            <p><strong>Vihara:</strong> {{ $user->vihara }}</p>
+            <h1><strong>Hai, saya <br> {{ $anggota->Nama_Lengkap }} !</strong></h1>
+            <p><strong>Email: </strong>{{ $anggota->Email }}</p>
+            <p><strong>Jenis Kelamin:</strong> {{ $anggota->Jenis_Kelamin }}</p>
+            <p><strong>Tanggal Lahir:</strong> {{ $anggota->Tanggal_Lahir }}</p>
+            <p><strong>Golongan Darah:</strong> {{ $anggota->Golongan_Darah }}</p>
             </div>
 
             <div>
-                {{-- @if (Auth::check() && Auth::user()->user_id == $user->user_id)
-                <a href="{{ route('users.edit', $user->user_id) }}" class="btn" style="margin-right: 8px;">Edit Profile</a>
-                @endif --}}
+
                 <a href="/" class="btn">Kembali</a>  
                 
             </div>

@@ -302,44 +302,53 @@
                 style="flex: 1; max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
         </form>
     </div>
-
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
+    
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Event ID</th>
+                    <th>Nama Event</th>
+                    <th>Tanggal Mulai</th>
+                    <th>Tanggal Berakhir</th>
+                    <th>Daerah</th>
+                    <th>Pembuat</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($events as $event)
                     <tr>
-                        <th>Event ID</th>
-                        <th>Nama Event</th>
-                        <th>Tanggal Mulai</th>
-                        <th>Tanggal Berakhir</th>
-                        <th>Daerah</th>
-                        <th>Pembuat</th>
-                        <th>Action</th>
+                        <td>{{ $event->id }}</td>
+                        <td>{{ $event->nama_event }}</td>
+                        <td>{{ $event->start_date }}</td>
+                        <td>{{ $event->end_date }}</td>
+                        <td>
+                            @if ($event->nama_dpd)
+                                {{ $event->nama_dpd }} (DPD)
+                            @elseif ($event->nama_dpc)
+                                {{ $event->nama_dpc }} (DPC)
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td>{{ $event->nama }}</td> <!-- Directly use users.nama from the join -->
+                        <td>
+                            <div style="display: flex; gap: 10px; justify-content: center;">
+                                <a href="{{ route('events.attend', $event->id) }}" class="btn btn-info btn-sm">Absen</a>
+                                <a href="{{ route('attendance.index', $event->id) }}" class="btn btn-info btn-sm">Daftar Absen</a>
+                            </div>
+                            <div style="display: flex; gap: 10px; justify-content: center;">
+                                <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('events.delete', $event->id) }}')">Delete</a>
+                            </div>                            
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach ($events as $event)
-                        <tr>
-                            <td>{{ $event->id }}</td>
-                            <td>{{ $event->name }}</td>
-                            <td>{{ $event->start_date }}</td>
-                            <td>{{ $event->end_date }}</td>
-                            <td>{{ $event->creator->daerah }}</td>
-                            <td>{{ $event->creator->nama_lengkap }}</td>
-                            <td>
-                                <div style="display: flex; gap: 10px; justify-content: center;">
-                                    <a href="{{ route('events.attend', $event->id) }}" class="btn btn-info btn-sm">Absen</a>
-                                    <a href="{{ route('attendance.index', $event->id) }}" class="btn btn-info btn-sm">Daftar Absen</a>
-                                </div>
-                                <div style="display: flex; gap: 10px; justify-content: center;">
-                                    <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('events.delete', $event->id) }}')">Delete</a>
-                                </div>                            
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
 
         <nav aria-label="Page navigation">
             <ul class="pagination justify-content-center">

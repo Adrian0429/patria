@@ -194,6 +194,10 @@
             <h2 class="detail-section-title">Informasi Pribadi</h2>
             <div class="detail-grid">
                 <div class="detail-item">
+                    <div class="detail-label">ID Anggota</div>
+                    <div class="detail-value">{{ $anggota->id }}</div>
+                </div>
+                <div class="detail-item">
                     <div class="detail-label">ID Kartu</div>
                     <div class="detail-value">{{ $anggota->ID_Kartu }}</div>
                 </div>

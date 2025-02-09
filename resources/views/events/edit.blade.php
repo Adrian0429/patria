@@ -62,10 +62,8 @@
     <form action="{{ route('events.update', $event->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
-        <label for="name">Event Name:</label>
-        <input type="text" name="name" id="name" value="{{ $event->name }}" required>
-        {{-- <label for="logo">Event Logo:</label>
-        <input type="file" name="logo" id="logo"> --}}
+        <label for="nama_event">Event Name:</label>
+        <input type="text" name="nama_event" id="nama_event" value="{{ $event->nama_event }}" required>
 
         <label for="start_date">Start Date:</label>
         <input type="date" name="start_date" id="start_date" value="{{ $event->start_date }}" required>

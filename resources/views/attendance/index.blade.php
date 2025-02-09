@@ -270,9 +270,9 @@
             <tbody>
                 @foreach ($attendances as $attendance)
                     <tr>
-                        <td>{{ $attendance->user_id }}</td>
-                        <td>{{ $attendance->nama_lengkap }}</td>
-                        <td>{{ $attendance->user_email }}</td>
+                        <td>{{ $attendance->id }}</td>
+                        <td>{{ $attendance->nama_anggota }}</td>
+                        <td>{{ $attendance->email_anggota }}</td>
                         <td>{{ $attendance->created_at }}</td>
                         <td>
                             <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('attendance.delete', $attendance->id) }}')">Delete</button>

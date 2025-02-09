@@ -156,7 +156,7 @@ class DataAnggotaController extends Controller
             'id_anggota' => $anggota->id,
             'keterangan' => $validated['keterangan'] ?? 'Data anggota baru ditambahkan',
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
-            'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->role ?? 'Unknown',
+            'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->jabatan ?? 'Unknown',
             'created_at' => now(), // Manually set 'created_at'
         ]);
 
@@ -236,7 +236,7 @@ class DataAnggotaController extends Controller
             'id_anggota' => $anggota->id,
             'keterangan' => $validated['keterangan'] ?? 'Update Data anggota',
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
-            'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->role ?? 'Unknown',
+            'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->jabatan ?? 'Unknown',
             'created_at' => now(), 
         ]);
 
@@ -330,6 +330,18 @@ class DataAnggotaController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    public function show($idOrCardId)
+    {
+        try {
+            $anggota = DataAnggota::where('id', $idOrCardId)
+                        ->orWhere('ID_Kartu', $idOrCardId)
+                        ->firstOrFail();
+
+            return view('anggota.show', compact('anggota'));
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return redirect()->back()->with('error', 'User not found. Please try again.');
+        }
+    }
         
     public function uploadimage(Request $request)
     {   
@@ -352,19 +364,6 @@ class DataAnggotaController extends Controller
         return redirect()->back()->with('error', 'No images were uploaded.');
     }
 
-
-    public function show($idOrCardId)
-    {
-        try {
-            $user = User::where('user_id', $idOrCardId)
-                        ->orWhere('card_id', $idOrCardId)
-                        ->firstOrFail();
-
-            return view('users.show', compact('user'));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return redirect()->back()->with('error', 'User not found. Please try again.');
-        }
-    }
 
 
     public function search(Request $request)

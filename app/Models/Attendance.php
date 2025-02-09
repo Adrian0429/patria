@@ -12,7 +12,7 @@ class Attendance extends Model
     protected $table = 'attendances';
 
     protected $fillable = [
-        'event_id', 'user_id', 'attendance_date'
+        'event_id', 'id_anggota', 'attendance_date'
     ];
 
     public function event()
@@ -22,6 +22,6 @@ class Attendance extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(DataAnggota::class, 'id_anggota', 'id');
     }
 }

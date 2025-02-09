@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Attendance;
-use App\Models\User;
+use App\Models\DataAnggota;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,22 +19,32 @@ class EventAttendanceController extends Controller
         $search = $request->query('search'); // Capture the search query
 
         // Initialize the query
-        if ($user->role === 'admin') {
-            $query = Event::query();
+        if ($user->jabatan === 'admin') {
+            $query = Event::query()
+                ->select('events.*', 'users.nama', 'users.jabatan', 'dpd.nama_dpd', 'dpc.nama_dpc')
+                ->join('users', 'events.user_id', '=', 'users.id')
+                ->leftJoin('dpd', 'users.dpd_id', '=', 'dpd.id')
+                ->leftJoin('dpc', 'users.dpc_id', '=', 'dpc.id');
         } else {
-            $query = Event::where('created_by', $user->user_id);
+            $query = Event::query()
+                ->select('events.*', 'users.nama', 'users.jabatan', 'dpd.nama_dpd', 'dpc.nama_dpc')
+                ->join('users', 'events.user_id', '=', 'users.id')
+                ->leftJoin('dpd', 'users.dpd_id', '=', 'dpd.id')
+                ->leftJoin('dpc', 'users.dpc_id', '=', 'dpc.id')
+                ->where('events.user_id', $user->id);
         }
 
         // Apply search filter if a search term is provided
         if ($search) {
-            $query->where('name', 'LIKE', "%{$search}%");
+            $query->where('events.nama_event', 'LIKE', "%{$search}%");
         }
 
         // Paginate the results
-        $events = $query->paginate(5);
+        $events = $query->paginate(7);
 
         return view('events.index', compact('events', 'search'));
     }
+
 
     public function createEventForm()
     {
@@ -42,44 +52,51 @@ class EventAttendanceController extends Controller
     }
 
     public function createEvent(Request $request)
-    {   
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to create an event.');
+        }
+
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+            'nama_event' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $logoPath = null;
-        if ($request->hasFile('logo')) {
-            $logoPath = $request->file('logo')->store('logos', 'public');
-        }
+        // Debugging: Check if user_id is correctly retrieved
+        \Log::info('Creating Event', ['user_id' => auth()->user()->id]);
 
         Event::create([
-            'name' => $validated['name'],
-            'logo' => $logoPath,
+            'nama_event' => $validated['nama_event'],
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
-            'created_by' => auth()->user()->user_id,
+            'user_id' => auth()->user()->id,
         ]);
 
         return redirect()->route('events.index')->with('success', 'Event created successfully!');
     }
 
-    public function updateEvent(Request $request, $id)
+
+    public function editEventForm($id)
+    {
+        $event = Event::findOrFail($id);
+        return view('events.edit', compact('event'));
+    }
+
+
+  public function updateEvent(Request $request, $id)
     {
         // Find the event and check if it exists
         $event = Event::findOrFail($id);
 
         // Ensure only the creator or an admin can update the event
-        if (auth()->user()->role !== 'admin' && $event->created_by !== auth()->user()->user_id) {
+        if (auth()->user()->jabatan !== 'admin' && $event->user_id !== auth()->user()->id) {
             return redirect()->route('events.index')->with('error', 'You are not authorized to update this event.');
         }
 
         // Validate the input
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+            'nama_event' => 'sometimes|required|string|max:255',
             'start_date' => 'sometimes|required|date',
             'end_date' => 'sometimes|required|date|after_or_equal:start_date',
         ]);
@@ -88,13 +105,14 @@ class EventAttendanceController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        // Prepare the data for updating
-        $data = $request->only('name', 'start_date', 'end_date');
+        // Prepare the data for updating (Correct field names)
+        $data = $request->only('nama_event', 'start_date', 'end_date');
+
+        // Handle file upload correctly
         if ($request->hasFile('logo')) {
             $data['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
-        // Update the event (created_by is not updated)
         $event->update($data);
 
         return redirect()->route('events.index')->with('success', 'Event updated successfully!');
@@ -104,12 +122,6 @@ class EventAttendanceController extends Controller
     {
         $event = Event::findOrFail($id);
         return view('events.attend', compact('event'));
-    }
-
-    public function editEventForm($id)
-    {
-        $event = Event::findOrFail($id);
-        return view('events.edit', compact('event'));
     }
 
     public function deleteEvent($id)
@@ -134,25 +146,28 @@ class EventAttendanceController extends Controller
                 ->withInput();
         }
 
-        $event = Event::find($request->event_id);
-        $user = User::find($request->user_id);
-        $today = now()->toDateString();
-
-        if (!$event) {
-            return redirect()->back()->with('error', 'Event not found.');
-        }
+        // Find the user by either 'id' or 'ID_Kartu'
+        $user = DataAnggota::where('id', $request->user_id)
+            ->orWhere('ID_Kartu', $request->user_id)
+            ->first();
 
         if (!$user) {
             return redirect()->back()->with('error', 'User not found.');
         }
 
+        $event = Event::find($request->event_id);
+        if (!$event) {
+            return redirect()->back()->with('error', 'Event not found.');
+        }
+
+        $today = now()->toDateString();
         if ($event->start_date > $today || $event->end_date < $today) {
             return redirect()->back()->with('error', 'Attendance is not allowed outside the event dates.');
         }
 
         $attendanceExists = Attendance::where([
             ['event_id', $request->event_id],
-            ['user_id', $request->user_id],
+            ['id_anggota', $user->id], // Correct ID reference
             ['attendance_date', $today],
         ])->exists();
 
@@ -163,33 +178,36 @@ class EventAttendanceController extends Controller
         try {
             Attendance::create([
                 'event_id' => $request->event_id,
-                'user_id' => $request->user_id,
+                'id_anggota' => $user->id, // Always use the actual user ID
                 'attendance_date' => $today,
             ]);
 
             return redirect()->route('events.attend', $request->event_id)
                 ->with('success', 'Attendance recorded successfully!');
         } catch (\Exception $e) {
+            \Log::error('Attendance Error:', ['error' => $e->getMessage()]);
             return redirect()->back()->with('error', 'Failed to record attendance. Please try again.');
         }
     }
 
+
     public function getAttendance($event_id)
     {
         $event = Event::findOrFail($event_id);
-        $attendances = Attendance::join('users', 'attendances.user_id', '=', 'users.user_id') // Join users table
+        $attendances = Attendance::join('data_anggota', 'attendances.id_anggota', '=', 'data_anggota.id') // Join users table
             ->join('events', 'attendances.event_id', '=', 'events.id') // Join events table
             ->where('attendances.event_id', $event_id)
             ->select(
                 'attendances.*', 
-                'users.nama_lengkap as nama_lengkap', 
-                'users.email as user_email', 
-                'events.name as event_name', 
-                'events.logo as event_logo'
+                'data_anggota.id as id_anggota',
+                'data_anggota.Nama_Lengkap as nama_anggota',
+                'data_anggota.Email as email_anggota',
+                
             ) 
             ->orderBy('attendances.created_at', 'asc')
             ->paginate(15);
 
+            // dd($attendances);
         return view('attendance.index', compact('attendances', 'event'));
     }
 
@@ -198,23 +216,21 @@ class EventAttendanceController extends Controller
     {
         $event = Event::findOrFail($event_id);
 
-        $attendances = Attendance::join('users', 'attendances.user_id', '=', 'users.user_id') // Join users table
+        $attendances = Attendance::join('data_anggota', 'attendances.id_anggota', '=', 'data_anggota.id') // Join users table
+            ->join('events', 'attendances.event_id', '=', 'events.id') // Join events table
             ->where('attendances.event_id', $event_id)
             ->select(
-                'attendances.id as attendance_id',
-                'users.user_id',
-                'users.nama_lengkap as nama_lengkap',
-                'users.email as user_email',
-                'attendances.created_at as attendance_date'
+                'data_anggota.id as id_anggota',
+                'data_anggota.Nama_Lengkap as nama_anggota',
+                'data_anggota.Email as email_anggota',
+                'attendances.created_at as attendance_date',
             ) 
             ->orderBy('attendances.created_at', 'asc')
             ->get();
 
-            // dd($attendances);
         $csvHeaders = [
-            'Attendance ID',
-            'User ID',
-            'Full Name',
+            'ID Anggota',
+            'Nama Lengkap',
             'Email',
             'Attendance Date',
         ];
@@ -227,10 +243,9 @@ class EventAttendanceController extends Controller
 
             foreach ($attendances as $attendance) {
                 fputcsv($file, [
-                    $attendance->attendance_id,
-                    $attendance->user_id,
-                    $attendance->nama_lengkap,
-                    $attendance->user_email,
+                    $attendance->id_anggota,
+                    $attendance->nama_anggota,
+                    $attendance->email_anggota,
                     $attendance->attendance_date,
                 ]);
             }

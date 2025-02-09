@@ -67,12 +67,8 @@
     <h1>Create Event</h1>
     <form action="{{ route('events.create') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <label for="name">Event Name:</label>
-        <input type="text" name="name" id="name" placeholder="Enter Event Name" required>
-
-        {{-- <label for="logo">Event Logo:</label>
-        <input type="file" name="logo" id="logo" accept="image/*" onchange="previewLogo(event)">
-        <img id="logo-preview" src="#" alt="Logo Preview"> --}}
+        <label for="nama_event">Event Name:</label>
+        <input type="text" name="nama_event" id="nama_event" placeholder="Enter Event Name" required>
 
         <label for="start_date">Start Date:</label>
         <input type="date" name="start_date" id="start_date" required>

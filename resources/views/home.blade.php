@@ -255,7 +255,7 @@
 
             const userId = document.getElementById('userId').value.trim();
             if (userId) {
-                const url = `/users/${userId}`;
+                const url = `/show/anggota/${userId}`;
                 window.open(url, '_blank');
                 
                 // Clear the input field after submission
