@@ -11,6 +11,7 @@
     <!-- Toastify CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
+
         body {
             background-color: #f8f9fa; /* Light gray background */
             font-family: 'Inter', sans-serif;
@@ -94,6 +95,7 @@ input::placeholder, textarea::placeholder {
 button, .btn {
     font-size: 1rem;
     font-weight: bold;
+    border: none;
 }
 
 /* Links */
@@ -129,8 +131,10 @@ small {
     margin-bottom: 20px;
 }
 
-.btn-add-user:hover {
-    background-color: #0056b3;
+.btn-add-user:hover {  
+    color: white;
+    background-color: #004bff;
+    text-decoration: none;
     transform: translateY(-2px); /* Slight lift effect on hover */
 }
 
@@ -138,6 +142,72 @@ small {
     outline: none;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); /* Focus ring */
 }
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 350px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal h3 {
+    margin-bottom: 15px;
+    color: #0056b3;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.btn-secondary {
+    background-color: gray;
+    color: white;
+}
+
+input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background: #f8f8f8;
+    text-align: center;
+}
+
+input[type="file"]:hover {
+    border-color: #888;
+}
+
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </head>
@@ -147,7 +217,11 @@ small {
         <h1 class="text-center text-primary font-bold">Tambahkan Anggota Baru</h1>
         <div class="button-row">
             <a href="{{ route('anggota.home') }}" class="btn-add-user">Daftar Anggota</a>
-            {{-- <a href="{{ route('users.template') }}" class="btn-add-user">Download CSV Template</a> --}}
+            <div>
+                <a href="{{ route('template') }}" class="btn-add-user">Download CSV Template</a>
+                <button class="btn-add-user" onclick="openImageModal()">Upload Batch Foto</button>
+            </div>
+            
         </div>
 
         <div class="card p-4">
@@ -168,10 +242,26 @@ small {
 
 
             <!-- CSV File Upload Section -->
-            <form id="csv_section" class="mb-3" action="{{ route('anggota.storeCSV') }}" method="POST" enctype="multipart/form-data" style="display: none;">
+            <form id="csv_section" class="mb-3" action="{{ route('anggota.importCSV') }}" method="POST" enctype="multipart/form-data" style="display: none;">
                 @csrf
                 <label for="csv_file" class="form-label">Upload CSV File:</label>
-                <input type="file" class="form-control" name="csv_file" id="csv_file" accept=".csv">
+                <input type="file" class="form-control" name="file" id="file" accept=".csv">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="nama_penginput" class="form-label">Nama Penginput</label>
+                        <input type="text" class="form-control" id="nama_penginput" name="nama_penginput" placeholder="Nama Penginput">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="jabatan_penginput" class="form-label">Jabatan Penginput</label>
+                        <input type="text" class="form-control" id="jabatan_penginput" name="jabatan_penginput" placeholder="Jabatan Penginput">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="keterangan" class="form-label">Keterangan Input</label>
+                        <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Keterangan Input">
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary w-100 mt-3">Submit</button>
             </form>
 
@@ -341,6 +431,20 @@ small {
         </div>
     </div>
 
+    <div id="uploadImageModal" class="modal">
+        <div class="modal-content">
+            <h3>Upload Multiple Images</h3>
+            <div class="modal-actions">
+                <button id="cancelUpload" class="btn btn-secondary">Cancel</button>
+                <form id="imageForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" name="images[]" id="image" accept="image/*" multiple>
+                    <button type="submit" class="btn btn-add-user">Upload</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Toastify Script -->
     <script>
 
@@ -348,6 +452,18 @@ small {
     const inputManual = document.getElementById("input_manual");
     const csvSection = document.getElementById("csv_section");
     const manualSection = document.getElementById("manual_section");
+    const uploadModal = document.getElementById('uploadImageModal');
+    const imageForm = document.getElementById('imageForm');
+
+    function openImageModal() {
+        imageForm.setAttribute('action', "{{ route('anggota.uploadImage') }}");
+        imageForm.reset();
+        uploadModal.style.display = 'flex';
+    }
+
+    document.getElementById('cancelUpload').addEventListener('click', function () {
+        uploadModal.style.display = 'none';
+    });
 
     function previewImage(event) {
         const input = event.target;
@@ -383,20 +499,31 @@ small {
         }
     });
 
-        document.addEventListener("DOMContentLoaded", () => {
-            @if ($errors->any())
-                @foreach ($errors->all() as $error)
-                    Toastify({
-                        text: "{{ $error }}",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "#ff6b6b",
-                    }).showToast();
-                @endforeach
-            @endif
-        });
+    document.addEventListener("DOMContentLoaded", () => {
+        @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            Toastify({
+            text: "{{ $error }}",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#ff6b6b",
+            }).showToast();
+        @endforeach
+        @endif
+
+        @if (session('success'))
+        Toastify({
+            text: "{{ session('success') }}",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#28a745",
+        }).showToast();
+        @endif
+    });
 
 </script>
 </body>

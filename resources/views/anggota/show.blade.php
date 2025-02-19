@@ -193,8 +193,9 @@
             </div>
         </div>
         <div class="user-picture-container">
-            @if($anggota->image_link)
-            <img class="user-picture" src="{{ asset('storage/' . $anggota->image_link) }}"/>
+            
+            @if($anggota->img_link)
+            <img class="user-picture" src="{{ asset('storage/' . $anggota->img_link) }}"/>
             @endif
         </div>
 

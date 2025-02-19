@@ -21,10 +21,8 @@ class DataAnggotaController extends Controller
     public function index(Request $request)
     {   
         
-        // Get the search term from the query parameter
         $search = $request->query('search');
 
-        // Initialize the query
         $query = DataAnggota::query();
         
         if (auth()->user()->jabatan == 'DPD') {
@@ -41,7 +39,6 @@ class DataAnggotaController extends Controller
             });
         }
 
-        // Join with DPD or DPC based on dpc_id or dpd_id
         $query->leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
               ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
               ->select('data_anggota.*', 'dpd.nama_dpd', 'dpc.nama_dpc');
@@ -245,10 +242,10 @@ class DataAnggotaController extends Controller
 
     public function exportCSV()
     {
-        $fileName = 'data_anggota.csv';
 
+        $fileName = 'data_anggota.csv';
         // Fetch all anggota data with related DPD/DPC
-        $anggota = DataAnggota::leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
+        $query = DataAnggota::leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
             ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
             ->select(
                 'data_anggota.ID_Kartu',
@@ -272,9 +269,19 @@ class DataAnggotaController extends Controller
                 'dpd.kode_daerah AS Kode_DPD',
                 'dpc.nama_dpc AS Nama_DPC',
                 'dpc.kode_daerah AS Kode_DPC',
+                'data_anggota.dpd_id',
+                'data_anggota.dpc_id',
                 'data_anggota.created_at'
-            )
-            ->get();
+            );
+
+        if (auth()->user()->jabatan == 'DPD') {
+            $query->where('dpd_id', '=', auth()->user()->dpd_id);
+        } else if (auth()->user()->jabatan == 'DPC' || auth()->user()->jabatan == 'DPAC') {
+            $query->where('dpc_id', '=', auth()->user()->dpc_id);
+        }
+
+
+        $anggota = $query->get(); 
 
         $headers = [
             "Content-type"        => "text/csv",
@@ -330,6 +337,7 @@ class DataAnggotaController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+
     public function show($idOrCardId)
     {
         try {
@@ -337,34 +345,41 @@ class DataAnggotaController extends Controller
                         ->orWhere('ID_Kartu', $idOrCardId)
                         ->firstOrFail();
 
+            // dd($anggota);
             return view('anggota.show', compact('anggota'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return redirect()->back()->with('error', 'User not found. Please try again.');
         }
     }
-        
-    public function uploadimage(Request $request)
-    {   
-        $request->validate([
-            'photos.*' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Added max size validation
-        ]);
+                
+    public function uploadImage(Request $request)
+    {
+        if (!$request->hasFile('images')) {
+            return redirect()->back()->with('error', 'No files received!');
+        }
 
         $uploadedPaths = [];
 
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $file) {
-                $imageName = time() . '_' . $file->getClientOriginalName(); // Add timestamp to prevent overwriting
-                $path = $file->storeAs('images', $imageName, 'public');
-                $uploadedPaths[] = $path;
+        foreach ($request->file('images') as $image) {
+            if (!$image->isValid()) {
+                return redirect()->back()->with('error', 'File upload failed!');
             }
 
-            return redirect()->back()->with('success', 'Images uploaded successfully!');
+            $filename = $image->getClientOriginalName();
+            $storagePath = "uploads/anggota/$filename";
+
+            // Delete old file if exists
+            if (Storage::disk('public')->exists($storagePath)) {
+                Storage::disk('public')->delete($storagePath);
+            }
+
+            // Store new file
+            $path = $image->storeAs('uploads/anggota', $filename, 'public');
+            $uploadedPaths[] = $path;
         }
 
-        return redirect()->back()->with('error', 'No images were uploaded.');
+        return redirect()->back()->with('success', 'Images uploaded successfully!');
     }
-
-
 
     public function search(Request $request)
     {
@@ -374,32 +389,218 @@ class DataAnggotaController extends Controller
 
         return redirect()->route('users.show', $validatedData['userId']);
     }
-
-    public function downloadTemplate()
+        
+    public function template()
     {
         $headers = [
-            'card_id', 'user_id', 'nama_lengkap', 'jenis_kelamin',
-            'tanggal_lahir', 'golongan_darah', 'vihara',
-            'email', 'role', 'password', 'daerah'
+            'ID_Kartu', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
+            'Email', 'No_HP', 'Jenis_Kelamin', 'Alamat', 'Kota_Lahir', 'Tanggal_Lahir',
+            'Golongan_Darah', 'img_link (biarkan kosong)', 'Mengenal_Patria_Dari', 'Histori_Patria',
+            'Pernah_Mengikuti_PBT', 'dpd_id(lihat dari data dpd)', 'dpc_id(lihat dari data dpc)'
         ];
 
- 
-        $exampleRow = [
-            '12345', 'USR001', 'John Doe', 'Laki-laki',
-            '1990-01-01', 'A', 'Buddhist Temple',
-            'johndoe@example.com', 'admin', 'password123', 'Jakarta'
+        $exampleRow1 = [
+            'id kartu anggota 1', '1234567890123456', 'Jane Doe', 'Nama Buddhis', 'S.Kom', 'Software Engineer',
+            'johndoe@example.com', '08123456789', 'Laki-Laki', 'Jl. Contoh No. 123', 'Jakarta', '1990-01-01',
+            'A', '', 'Teman', 'Pernah ikut acara', '1', '1', ''
         ];
 
-        $csvContent = implode(';', $headers) . "\n" . implode(';', $exampleRow);
+        $exampleRow2 = [
+            'id kartu anggota 2', '9876543210987654', 'Jane Smith', 'Nama Buddhis 2', 'M.M', 'Data Analyst',
+            'aniwijaya@example.com', '081298765432', 'Perempuan', 'Jl. Contoh No. 456', 'Bandung', '1995-05-15',
+            'B', '', 'Sosial Media', 'Ikut kegiatan', '0', '', '2'
+        ];
+
+        // Convert array to CSV format
+        $csvContent = implode(';', $headers) . "\n" .
+                    implode(';', $exampleRow1) . "\n" .
+                    implode(';', $exampleRow2);
 
         $filename = "template_tambah_anggota.csv";
 
-        // Return the CSV as a download
         return Response::make($csvContent, 200, [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=$filename",
         ]);
     }
 
+    public function importCSV(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:csv,txt|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $handle = fopen($file->getPathname(), 'r');
+
+        if (!$handle) {
+            return back()->withErrors(['file' => 'Gagal membaca file.']);
+        }
+
+        $headers = fgetcsv($handle, 1000, ';'); // Read the header row
+        $expectedHeaders = [
+            'ID_Kartu', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
+            'Email', 'No_HP', 'Jenis_Kelamin', 'Alamat', 'Kota_Lahir', 'Tanggal_Lahir',
+            'Golongan_Darah', 'img_link (biarkan kosong)', 'Mengenal_Patria_Dari', 'Histori_Patria',
+            'Pernah_Mengikuti_PBT', 'dpd_id(lihat dari data dpd)', 'dpc_id(lihat dari data dpc)'
+        ];
+
+        if ($headers !== $expectedHeaders) {
+            return back()->withErrors(['file' => 'Format CSV tidak sesuai.']);
+        }
+
+        $dataToInsert = [];
+        $now = now();
+        
+        while (($row = fgetcsv($handle, 1000, ';')) !== false) {
+            $dpd_id = !empty($row[17]) ? (int) $row[17] : null;
+            $dpc_id = !empty($row[18]) ? (int) $row[18] : null;
+
+            if (!$dpd_id && !$dpc_id) {
+                continue; // Skip if neither dpd_id nor dpc_id is provided
+            }
+
+            // Generate ID_Kartu
+            $kodeWilayah = $dpd_id ? DPD::where('id', $dpd_id)->value('kode_daerah') : DPC::where('id', $dpc_id)->value('kode_daerah');
+            $tahun = date('y');
+            $lastEntry = DataAnggota::where('id', 'like', "$kodeWilayah$tahun%")
+                                    ->orderBy('id', 'desc')
+                                    ->first();
+            $nextKode = $lastEntry ? (intval(substr($lastEntry->id, -4)) + 1) : 1;
+            $id_anggota = sprintf("%s%s%04d", $kodeWilayah, $tahun, $nextKode);
+
+
+            $tanggalLahir = null;
+            if (!empty($row[11])) {
+                $tanggalLahir = \DateTime::createFromFormat('d/m/y', $row[11]) 
+                    ?: \DateTime::createFromFormat('d/m/Y', $row[11]) 
+                    ?: \DateTime::createFromFormat('Y-m-d', $row[11]); // Added support for 'Y-m-d'
+
+                if ($tanggalLahir) {
+                    $tanggalLahir = $tanggalLahir->format('Y-m-d'); // Convert to MySQL format
+                } else {
+                    return back()->withErrors(['file' => 'Format tanggal lahir tidak valid pada baris: ' . json_encode($row)]);
+                }
+            }
+
+            $dataToInsert[] = [
+                'id' => $id_anggota,
+                'ID_Kartu' => $row[0],
+                'NIK' => $row[1] ?? null,
+                'Nama_Lengkap' => $row[2] ?? null,
+                'Nama_Buddhis' => $row[3] ?? null,
+                'Gelar_Akademis' => $row[4] ?? null,
+                'Profesi' => $row[5] ?? null,
+                'Email' => $row[6] ?? null,
+                'No_HP' => $row[7] ?? null,
+                'Jenis_Kelamin' => $row[8] ?? null,
+                'Alamat' => $row[9] ?? null,
+                'Kota_Lahir' => $row[10] ?? null,
+                'Tanggal_Lahir' => $tanggalLahir,
+                'Golongan_Darah' => $row[12] ?? null,
+                'Mengenal_Patria_Dari' => $row[14] ?? null,
+                'Histori_Patria' => $row[15] ?? null,
+                'img_link'=> 'uploads/anggota/' . $id_anggota . '.png',
+                'Pernah_Mengikuti_PBT' => filter_var($row[16], FILTER_VALIDATE_BOOLEAN),
+                'dpd_id' => $dpd_id,
+                'dpc_id' => $dpc_id,
+            ];
+        }
+
+        fclose($handle);
+
+        if (!empty($dataToInsert)) {
+            foreach ($dataToInsert as $data) {
+                $anggota = DataAnggota::create($data);
+
+                InformasiAkses::create([
+                    'type' => 'create',
+                    'user_id' => Auth::id(),
+                    'id_anggota' => $anggota->id, // Store the newly created anggota ID
+                    'keterangan' => $request->keterangan ?? 'Data anggota baru ditambahkan',
+                    'nama_penginput' => $request->nama_penginput ?? Auth::user()->name ?? 'Unknown',
+                    'jabatan_penginput' => $request->jabatan_penginput ?? Auth::user()->jabatan ?? 'Unknown',
+                    'created_at' => now(),
+                ]);
+            }
+            return back()->with('success', count($dataToInsert) . ' anggota berhasil diimport.');
+        }
+
+        return back()->withErrors(['file' => 'Tidak ada data yang dapat diimport.']);
+    }
+
     
+    public function exportDPDCSV()
+    {
+        $fileName = 'data_dpd.csv';
+        
+        $dpdData = DPD::select('id', 'nama_dpd', 'kode_daerah', 'created_at')->get();
+        
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+        
+        $callback = function() use ($dpdData) {
+            $file = fopen('php://output', 'w');
+            
+            fputcsv($file, ['ID', 'Nama DPD', 'Kode Daerah', 'Created At']);
+            
+            foreach ($dpdData as $row) {
+                fputcsv($file, [
+                    $row->id,
+                    $row->nama_dpd,
+                    $row->kode_daerah,
+                    $row->created_at
+                ]);
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportDPCCSV()
+    {
+        $fileName = 'data_dpc.csv';
+        
+        $dpcData = DPC::leftJoin('dpd', 'dpc.dpd_id', '=', 'dpd.id')
+            ->select('dpc.id', 'dpc.nama_dpc', 'dpc.kode_daerah', 'dpd.nama_dpd AS Nama_DPD', 'dpc.created_at')
+            ->get();
+        
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+        
+        $callback = function() use ($dpcData) {
+            $file = fopen('php://output', 'w');
+            
+            fputcsv($file, ['ID', 'Nama DPC', 'Kode Daerah', 'Nama DPD', 'Created At']);
+            
+            foreach ($dpcData as $row) {
+                fputcsv($file, [
+                    $row->id,
+                    $row->nama_dpc,
+                    $row->kode_daerah,
+                    $row->Nama_DPD,
+                    $row->created_at
+                ]);
+            }
+            
+            fclose($file);
+        };
+        
+        return response()->stream($callback, 200, $headers);
+    }
+
 }
+
+

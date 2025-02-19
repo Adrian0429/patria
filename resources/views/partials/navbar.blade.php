@@ -218,13 +218,16 @@
 
         <div class="links">
             <a href="/">Show</a>
-            @if (Auth::check() && Auth::User()->role != 'Anggota')
+            @if (Auth::check())
+            <a href="/anggota">Anggota</a>
+            <a href="/events">Event</a>
+            @endif
+            @if (Auth::check() && Auth::User()->jabatan == 'admin')
                 <a href="/users">Akun</a>
-                <a href="/anggota">Anggota</a>
                 <a href="/dpd">List DPD</a>
                 <a href="/dpc">List DPC</a>
-                <a href="/events">Event</a>
             @endif
+
         </div>
     </div>
 

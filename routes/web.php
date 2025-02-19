@@ -4,7 +4,7 @@ use App\Http\Controllers\DataAnggotaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\EventAttendanceController;
-
+use App\Http\Controllers\AksesController;
 
 Route::get('/', function () {
     return view('home');
@@ -19,7 +19,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::get('/show/anggota/{id}', [DataAnggotaController::class, 'show'])->name('anggota.show');
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-
+Route::get('template', [DataAnggotaController::class, 'template'])->name('template');
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     //akun patria
@@ -40,16 +40,25 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::put('/dpc/update/{id}', [UserController::class, 'update_dpc'])->name('users.update_dpc');
     Route::delete('/dpc/destroy/{id}', [UserController::class, 'destroy_dpc'])->name('users.destroy_dpc');
 
+    Route::get('/akses', [AksesController::class, 'index'])->name('akses.home');
+
+    Route::post('/uploadImage', [DataAnggotaController::class, 'uploadImage'])->name('anggota.uploadImage');
+    Route::delete('/anggota/{id}', [DataAnggotaController::class, 'destroy'])->name('anggota.destroy');
+});
+
+Route::middleware(['auth'])->group(function () {
     //data Anggota
     Route::get('/anggota', [DataAnggotaController::class, 'index'])->name('anggota.home');
     Route::get('/anggota/{id}', [DataAnggotaController::class, 'detail'])->name('anggota.detail');
-    Route::delete('/anggota/{id}', [DataAnggotaController::class, 'destroy'])->name('anggota.destroy');
     Route::get('/create/anggota', [DataAnggotaController::class, 'create'])->name('anggota.create');
     Route::post('/store/anggota', [DataAnggotaController::class, 'store'])->name('anggota.store');
     Route::get('/edit/anggota/{id}', [DataAnggotaController::class, 'edit'])->name('anggota.edit');
     Route::put('/update/anggota/{id}', [DataAnggotaController::class, 'update'])->name('anggota.update');
     Route::get('/download-csv', [DataAnggotaController::class, 'exportCSV'])->name('download.csv');
-    Route::post('/storecsv/anggota', [DataAnggotaController::class, 'store'])->name('anggota.storeCSV');
+    Route::post('/importCSV', [DataAnggotaController::class, 'importCSV'])->name('anggota.importCSV');
+
+    Route::get('/dataDPD', [DataAnggotaController::class, 'exportDPDCSV'])->name('download.dpd');
+    Route::get('/dataDPC', [DataAnggotaController::class, 'exportDPCCSV'])->name('download.dpc');
 
     // Event Routes
     Route::get('/events', [EventAttendanceController::class, 'getEvents'])->name('events.index');
@@ -65,5 +74,6 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/attendance/{event_id}', [EventAttendanceController::class, 'getAttendance'])->name('attendance.index');
     Route::delete('/attendance/{id}', [EventAttendanceController::class, 'deleteAttendance'])->name('attendance.delete');
     Route::get('/attendance/{event_id}/download', [EventAttendanceController::class, 'downloadAttendanceCSV'])->name('attendance.download');
-});
 
+
+});

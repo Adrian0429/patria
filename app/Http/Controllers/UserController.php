@@ -195,4 +195,6 @@ class UserController extends Controller
 
         return redirect()->route('users.home')->with('success', 'User deleted successfully.');
     }
+
+    
 }
