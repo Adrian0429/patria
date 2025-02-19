@@ -311,4 +311,28 @@ small {
     </div>
 </div>
 </body>
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+        const dpdSelect = document.getElementById("dpd_id");
+        const dpcSelect = document.getElementById("dpc_id");
+
+        function handleSelectionChange(selected, other) {
+            if (selected.value) {
+                other.value = ""; // Clear the other field
+                other.disabled = true; // Disable it
+            } else {
+                other.disabled = false; // Re-enable if nothing is selected
+            }
+        }
+z
+        dpdSelect.addEventListener("change", function () {
+            handleSelectionChange(dpdSelect, dpcSelect);
+        });
+
+        dpcSelect.addEventListener("change", function () {
+            handleSelectionChange(dpcSelect, dpdSelect);
+        });
+    });
+
+</script>
 </html>

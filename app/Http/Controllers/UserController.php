@@ -8,7 +8,7 @@ use App\Models\DPC;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
 
@@ -138,55 +138,39 @@ class UserController extends Controller
         // Pass the users with their DPD and DPC information to the view
         return view('users.home', compact('users', 'dpds', 'dpcs', 'search'));
     }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
-            'jabatan' => 'required|in:admin,DPC,DPD',
-            'dpd_id' => 'nullable|exists:dpd,id',
-            'dpc_id' => 'nullable|exists:dpc,id',
-        ]);
-
-        User::create([
-            'nama' => $request->nama,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'jabatan' => $request->jabatan,
-            'dpd_id' => $request->dpd_id,
-            'dpc_id' => $request->dpc_id,
-        ]);
-
-        return redirect()->route('users.home')->with('success', 'User created successfully.');
-    }
-
-    // Update user details
+    
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
 
-        $request->validate([
+        $data = $request->all();
+
+        // Convert empty string values to null
+        $data['dpd_id'] = $data['dpd_id'] === "" ? null : $data['dpd_id'];
+        $data['dpc_id'] = $data['dpc_id'] === "" ? null : $data['dpc_id'];
+
+        $validatedData = Validator::make($data, [
             'nama' => 'required|string|max:255',
-            'email' => "required|email|unique:users,email,{$id}",
-            'password' => 'nullable|min:6',
-            'jabatan' => 'required|in:admin,DPC,DPD',
+            'email' => 'required|email|unique:users,email,' . $user->id, // Ignore current user in unique validation
+            'password' => 'nullable|min:6', // Password is not required on update
+            'jabatan' => 'required|in:admin,DPP,DPD,DPC,DPAC',
             'dpd_id' => 'nullable|exists:dpd,id',
             'dpc_id' => 'nullable|exists:dpc,id',
-        ]);
+        ])->validate();
 
+        // Update user data
         $user->update([
-            'nama' => $request->nama,
-            'email' => $request->email,
-            'password' => $request->password ? Hash::make($request->password) : $user->password,
-            'jabatan' => $request->jabatan,
-            'dpd_id' => $request->dpd_id,
-            'dpc_id' => $request->dpc_id,
+            'nama' => $validatedData['nama'],
+            'email' => $validatedData['email'],
+            'jabatan' => $validatedData['jabatan'],
+            'dpd_id' => $validatedData['dpd_id'],
+            'dpc_id' => $validatedData['dpc_id'],
+            'password' => $validatedData['password'] ? Hash::make($validatedData['password']) : $user->password, // Only update if new password is provided
         ]);
 
         return redirect()->route('users.home')->with('success', 'User updated successfully.');
     }
+
 
     public function destroy($id)
     {

@@ -478,43 +478,94 @@
 </div>
 
 <script>
-   const userModal = document.getElementById('userModal');
+
+document.addEventListener("DOMContentLoaded", function () {
+    const jabatanSelect = document.getElementById("jabatan");
+    const dpdSelect = document.getElementById("dpd_id");
+    const dpcSelect = document.getElementById("dpc_id");
+
+    const userModal = document.getElementById('userModal');
     const deleteModal = document.getElementById('deleteModal');
     const userForm = document.getElementById('userForm');
     const deleteForm = document.getElementById('deleteForm');
 
-    function openUserModal() {
+    function enforceSingleSelection() {
+        dpdSelect.addEventListener("change", function () {
+            if (this.value) {
+                dpcSelect.value = ""; // Clear DPC if DPD is selected
+            }
+        });
+
+        dpcSelect.addEventListener("change", function () {
+            if (this.value) {
+                dpdSelect.value = ""; // Clear DPD if DPC is selected
+            }
+        });
+    }
+
+    function toggleDpdDpcFields() {
+        const jabatanValue = jabatanSelect.value;
+
+        if (jabatanValue === "DPP") {
+            dpdSelect.value = "";
+            dpcSelect.value = "";
+            dpdSelect.style.display = "none";
+            dpcSelect.style.display = "none";
+
+        } else {
+            dpdSelect.style.display = "block";
+            dpcSelect.style.display = "block";
+        }
+    }
+
+    // Attach event listeners
+    enforceSingleSelection();
+    jabatanSelect.addEventListener("change", toggleDpdDpcFields);
+
+    function initializeModal() {
+        enforceSingleSelection();  // Ensure event listeners are set
+        toggleDpdDpcFields(); // Set correct state for fields
+    }
+
+    window.openUserModal = function () {
+        console.log("Opening user modal..."); // Debugging log
         document.getElementById('modalTitle').innerText = 'Tambahkan Anggota';
         userForm.setAttribute('action', "{{ route('users.store') }}");
         userForm.reset();
+        initializeModal();  
         userModal.style.display = 'flex';
-    }
+    };
 
-    function openEditModal(user) {
+    window.openEditModal = function (user) {
+        console.log("Opening edit modal for:", user); // Debugging log
         document.getElementById('modalTitle').innerText = 'Edit Anggota';
         userForm.setAttribute('action', `/users/edit/${user.id}`);
         document.getElementById('userId').value = user.id;
         document.getElementById('nama').value = user.nama;
         document.getElementById('email').value = user.email;
         document.getElementById('jabatan').value = user.jabatan;
-        document.getElementById('dpd_id').value = user.dpd_id;
-        document.getElementById('dpc_id').value = user.dpc_id;
+        document.getElementById('dpd_id').value = user.dpd_id || "";
+        document.getElementById('dpc_id').value = user.dpc_id || "";
+        initializeModal();
         userModal.style.display = 'flex';
-    }
+    };
 
-    function openDeleteModal(actionUrl) {
+    window.openDeleteModal = function (actionUrl) {
+        console.log("Opening delete modal for:", actionUrl); // Debugging log
         deleteForm.setAttribute('action', actionUrl);
         deleteModal.style.display = 'flex';
-    }
+    };
 
-    function closeModal() {
+    window.closeModal = function () {
+        console.log("Closing modal..."); // Debugging log
         userModal.style.display = 'none';
         deleteModal.style.display = 'none';
-    }
-
-
+    };
 
     document.getElementById('cancelDelete').addEventListener('click', closeModal);
+});
+
+
 </script>
 
 @endsection
