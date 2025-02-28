@@ -223,7 +223,7 @@
             <a href="/events">Event</a>
             @endif
 
-            @if (Auth::User()->jabatan == 'DPC')
+            @if (Auth::check() && Auth::User()->jabatan == 'DPC')
                 <a href="/pindah_daerah">Pindah Daerah</a>
             @endif
 
