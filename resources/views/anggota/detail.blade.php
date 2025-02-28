@@ -127,8 +127,7 @@
     background-color: #f8d7da;
     color: #721c24;
 }
-
-/* Modal styles */
+/* Modal backdrop */
 .modal {
     display: none;
     position: fixed;
@@ -136,41 +135,115 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.4);
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
+/* Show modal effect */
+.modal.show {
+    display: flex;
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Modal content box */
 .modal-content {
     background: white;
     padding: 24px;
-    border-radius: 12px;
-    width: 400px;
+    border-radius: 10px;
+    width: 420px;
     max-width: 90%;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+    animation: slideIn 0.3s ease-in-out;
 }
 
-.modal h3 {
-    margin: 0 0 16px 0;
-    font-size: 1.25rem;
+/* Slide in effect */
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Modal title */
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+    text-align: center;
     color: #333;
 }
 
-.modal p {
-    margin: 0 0 24px 0;
-    color: #666;
+/* Form group styles */
+.form-group {
+    margin-bottom: 16px;
 }
 
+.form-group label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+    color: #444;
+}
+
+/* Input & Select styling */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border 0.2s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Modal actions */
 .modal-actions {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 12px;
+    margin-top: 20px;
 }
 
+/* Primary button */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Secondary (Cancel) button */
 .btn-secondary {
     background-color: #6c757d;
     color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s ease-in-out;
 }
 
 .btn-secondary:hover {
@@ -300,9 +373,45 @@
             <button class="btn btn-delete" onclick="openDeleteModal('{{ route('anggota.destroy', $anggota->id) }}')">
                 Hapus Anggota
             </button>
+            <button class="btn btn-primary" onclick="openPindahModal()">Pindah DPC</button>
+
         </div>
     </div>
 </div>
+
+{{-- Modal Pindah DPC --}}
+<div id="pindahModal" class="modal hidden">
+    <div class="modal-content">
+        <h3 class="modal-title">Pindah DPC</h3>
+        <form id="createForm" method="POST" action="{{ route('pindah_daerah.store') }}">
+            @csrf
+            <input type="hidden" id="id_anggota" name="id_anggota" value="{{ $anggota->id }}">
+
+            <div class="form-group">
+                <label for="asal_dpc">Asal DPC</label>
+                <input type="text" id="asal_dpc" class="form-control" value="{{ $anggota->nama_dpc ?? 'Tidak diketahui' }}" disabled>
+                <input type="hidden" name="asal_dpc" value="{{ $anggota->dpc_id }}">
+            </div>
+
+            <div class="form-group">
+                <label for="ke_dpc">Tujuan DPC</label>
+                <select id="ke_dpc" name="ke_dpc" class="form-control" required>
+                    <option value="">Pilih DPC Tujuan</option>
+                    @foreach ($dpc as $d)
+                        <option value="{{ $d->id }}">{{ $d->nama_dpc }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit" class="btn btn-primary">Simpan</button>
+                <button id="cancelPindah" type="button" class="btn btn-secondary">Batal</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal">
@@ -319,38 +428,87 @@
         </div>
     </div>
 </div>
+@if (session('error'))
+    <script>
+        Toastify({
+            text: "{{ session('error') }}",
+            backgroundColor: "#ff5f6d",
+            duration: 3000,
+            close: true,
+            gravity: "top", 
+            position: "right",
+            stopOnFocus: true 
+        }).showToast();
+    </script>
+@endif
 
+@if (session('success'))
+    <script>
+        Toastify({
+            text: "{{ session('success') }}",
+            backgroundColor: "#28a745",
+            duration: 3000,
+            close: true,
+            gravity: "top", 
+            position: "right",
+            stopOnFocus: true 
+        }).showToast();
+    </script>
+@endif
 
 <script>
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add("show");
+    modal.classList.remove("hide");
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    modal.classList.add("hide");
+
+    // Delay hiding completely to allow animation to finish
+    setTimeout(() => {
+        modal.classList.remove("show");
+    }, 300); // Match the CSS animation duration
+}
+
 document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("deleteModal");
-    const deleteForm = document.getElementById("deleteForm");
-    const cancelButton = document.getElementById("cancelDelete");
+    // Select modals & buttons
+    const deleteModal = document.getElementById("deleteModal");
+    const pindahModal = document.getElementById("pindahModal");
 
-    function closeDeleteModal() {
-        modal.style.display = "none";
-    }
+    const cancelDelete = document.getElementById("cancelDelete");
+    const cancelPindah = document.getElementById("cancelPindah");
 
-    function openDeleteModal(deleteUrl) {
-        deleteForm.action = deleteUrl;
-        modal.style.display = "flex";
-    }
-
-    // Ensure the cancel button closes the modal
-    cancelButton.addEventListener("click", function (event) {
-        event.preventDefault(); // Prevent any unintended behavior
-        closeDeleteModal();
+    // Cancel buttons close respective modals
+    cancelDelete.addEventListener("click", function () {
+        closeModal("deleteModal");
     });
 
-    // Close modal when clicking outside of it
+    cancelPindah.addEventListener("click", function () {
+        closeModal("pindahModal");
+    });
+
+    // Close modal when clicking outside the content
     window.addEventListener("click", function (event) {
-        if (event.target === modal) {
-            closeDeleteModal();
+        if (event.target === deleteModal) {
+            closeModal("deleteModal");
+        }
+        if (event.target === pindahModal) {
+            closeModal("pindahModal");
         }
     });
 
-    // Make the function available globally
-    window.openDeleteModal = openDeleteModal;
+    // Expose global functions for buttons
+    window.openDeleteModal = function (deleteUrl) {
+        document.getElementById("deleteForm").action = deleteUrl;
+        openModal("deleteModal");
+    };
+
+    window.openPindahModal = function () {
+        openModal("pindahModal");
+    };
 });
 
 </script>

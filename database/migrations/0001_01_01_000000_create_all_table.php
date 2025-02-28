@@ -105,6 +105,15 @@ return new class extends Migration {
 
         });
 
+        Schema::create('pindah_daerah', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('id_anggota')->constrained('data_anggota')->onDelete('cascade');
+            $table->foreignId('asal_dpc')->nullable()->constrained('dpc')->onDelete('cascade');
+            $table->foreignId('ke_dpc')->nullable()->constrained('dpc')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
+
         
     }
 

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\EventAttendanceController;
 use App\Http\Controllers\AksesController;
+use App\Http\Controllers\PindahDaerahController;
 
 Route::get('/', function () {
     return view('home');
@@ -75,5 +76,10 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/attendance/{id}', [EventAttendanceController::class, 'deleteAttendance'])->name('attendance.delete');
     Route::get('/attendance/{event_id}/download', [EventAttendanceController::class, 'downloadAttendanceCSV'])->name('attendance.download');
 
+    //pindah daerah
+    Route::get('/pindah_daerah', [PindahDaerahController::class, 'index'])->name('pindah_daerah.index');
+    Route::post('/pindah_daerah', [PindahDaerahController::class, 'store'])->name('pindah_daerah.store');
+    Route::post('/pindah_daerah/accept/{id}', [PindahDaerahController::class, 'accept'])->name('pindah_daerah.accept');
+    Route::post('/pindah_daerah/reject/{id}', [PindahDaerahController::class, 'reject'])->name('pindah_daerah.reject');
 
 });

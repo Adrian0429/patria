@@ -222,10 +222,17 @@
             <a href="/anggota">Anggota</a>
             <a href="/events">Event</a>
             @endif
+
+            @if (Auth::User()->jabatan == 'DPC')
+                <a href="/pindah_daerah">Pindah Daerah</a>
+            @endif
+
             @if (Auth::check() && Auth::User()->jabatan == 'admin')
                 <a href="/users">Akun</a>
                 <a href="/dpd">List DPD</a>
                 <a href="/dpc">List DPC</a>
+                <a href="/akses">Histori Akses</a>
+                <a href="/pindah_daerah">Pindah Daerah</a>
             @endif
 
         </div>

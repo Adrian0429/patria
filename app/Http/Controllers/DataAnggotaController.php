@@ -57,8 +57,10 @@ class DataAnggotaController extends Controller
             ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
             ->select('data_anggota.*', 'dpd.nama_dpd', 'dpc.nama_dpc')
             ->firstOrFail(); 
+        
+        $dpc = DPC::all();
 
-        return view('anggota.detail', compact('anggota'));
+        return view('anggota.detail', compact('anggota', 'dpc'));
     }
 
 
@@ -600,6 +602,8 @@ class DataAnggotaController extends Controller
         
         return response()->stream($callback, 200, $headers);
     }
+
+    
 
 }
 
