@@ -18,8 +18,6 @@
             height: calc(100vh - 84px);
         }
 
-
-
         .header-logo{
                 position: absolute;
                 display: flex;
@@ -28,7 +26,6 @@
                 top: 0;
                 left: 0;
                 margin-left: 5rem;
-                margin-top: 2rem;
         }
 
         @media (max-width: 768px) {
