@@ -25,7 +25,8 @@
                 align-items: center;
                 top: 0;
                 left: 0;
-                margin-left: 5rem;
+                margin-left: 3rem;
+                margin-top: 1rem;
         }
 
         @media (max-width: 768px) {
@@ -35,7 +36,7 @@
         }     
         
         .logo-patria { 
-                        width: 6rem;
+                        width: 4rem;
                         height: auto;
                     }
 
@@ -44,7 +45,7 @@
         .header-text { 
             margin-left: 1rem;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-family: 'Montserrat', sans-serif;
         }
 
