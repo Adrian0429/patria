@@ -329,7 +329,7 @@
                             @elseif ($event->nama_dpc)
                                 {{ $event->nama_dpc }} (DPC)
                             @else
-                                -
+                                Pusat
                             @endif
                         </td>
                         <td>{{ $event->nama }}</td> <!-- Directly use users.nama from the join -->
@@ -338,10 +338,12 @@
                                 <a href="{{ route('events.attend', $event->id) }}" class="btn btn-info btn-sm">Absen</a>
                                 <a href="{{ route('attendance.index', $event->id) }}" class="btn btn-info btn-sm">Daftar Absen</a>
                             </div>
+                            @if (Auth::user()->jabatan != 'DPP' && Auth::user()->jabatan != 'DPC')
                             <div style="display: flex; gap: 10px; justify-content: center;">
                                 <a href="{{ route('events.edit', $event->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                 <a href="#" class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('events.delete', $event->id) }}')">Delete</a>
-                            </div>                            
+                            </div>       
+                            @endif                     
                         </td>
                     </tr>
                 @endforeach

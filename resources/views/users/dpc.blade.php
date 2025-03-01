@@ -324,7 +324,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    {{-- <th>ID</th> --}}
                     <th>Nama DPC</th>
                     <th>DPD</th>
                     <th>Kode Daerah</th>
@@ -334,7 +334,7 @@
             <tbody>
                 @foreach ($dpcs as $dpc)
                     <tr>
-                        <td>{{ $dpc->id }}</td>
+                        {{-- <td>{{ $dpc->id }}</td> --}}
                         <td>{{ $dpc->nama_dpc }}</td>
                         <td>{{ $dpc->dpd->nama_dpd }}</td>
                         <td>{{ $dpc->kode_daerah }}</td>

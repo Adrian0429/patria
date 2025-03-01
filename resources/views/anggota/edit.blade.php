@@ -269,17 +269,6 @@ small {
                         </select>
                     </div>
 
-
-                    <div class="col-md-6 mb-3">
-                        <label for="nama_penginput" class="form-label">Nama Editor</label>
-                        <input type="text" class="form-control" id="nama_penginput" name="nama_penginput" placeholder="Nama Editor" value="{{ old('nama_penginput', $anggota->nama_penginput) }}">
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label for="jabatan_penginput" class="form-label">Jabatan Editor</label>
-                        <input type="text" class="form-control" id="jabatan_penginput" name="jabatan_penginput" placeholder="Jabatan Editor" value="{{ old('jabatan_penginput', $anggota->jabatan_penginput) }}">
-                    </div>
-                    
                     <div class="col-md-6 mb-3">
                         <label for="Status_Kartu" class="form-label">Status Kartu</label>
                         <select class="form-select" id="Status_Kartu" name="Status_Kartu">
@@ -289,9 +278,23 @@ small {
                         </select>
                     </div>
 
+                    <div class="col-md-6 mb-3 hidden">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="nama_penginput" class="form-label">Nama Editor</label>
+                        <input type="text" class="form-control" id="nama_penginput" name="nama_penginput" placeholder="Nama Editor" value="{{ old('nama_penginput', $anggota->nama_penginput) }}" required>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="jabatan_penginput" class="form-label">Jabatan Editor</label>
+                        <input type="text" class="form-control" id="jabatan_penginput" name="jabatan_penginput" placeholder="Jabatan Editor" value="{{ old('jabatan_penginput', $anggota->jabatan_penginput) }}" required>
+                    </div>
+                    
+
                     <div class="col-md-6 mb-3">
                         <label for="keterangan" class="form-label">Keterangan Edit</label>
-                        <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Keterangan Edit" value="{{ old('keterangan', $anggota->keterangan) }}">
+                        <input type="text" class="form-control" id="keterangan" name="keterangan" placeholder="Keterangan Edit" value="{{ old('keterangan', $anggota->keterangan) }}" required>
                     </div>
 
                 <div class="col-md-6 mb-3">

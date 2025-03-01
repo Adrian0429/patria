@@ -306,7 +306,7 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    {{-- <th>ID</th> --}}
                     <th>Nama dpd</th>
                     <th>Kode Daerah</th>
                     <th>Aksi</th>
@@ -315,7 +315,7 @@
             <tbody>
                 @foreach ($dpds as $dpd)
                     <tr>
-                        <td>{{ $dpd->id }}</td>
+                        {{-- <td>{{ $dpd->id }}</td> --}}
                         <td>{{ $dpd->nama_dpd }}</td>
                         <td>{{ $dpd->kode_daerah }}</td>
                         <td>
@@ -404,6 +404,32 @@
             </form>
         </div>
     </div>
+    @if (session('error'))
+            <script>
+                Toastify({
+                    text: "{{ session('error') }}",
+                    backgroundColor: "#ff5f6d",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top", 
+                    position: "right",
+                    stopOnFocus: true 
+                }).showToast();
+            </script>
+        @endif
+    @if (session('success'))
+        <script>
+            Toastify({
+                text: "{{ session('success') }}",
+                backgroundColor: "#28a745",
+                duration: 3000,
+                close: true,
+                gravity: "top", 
+                position: "right",
+                stopOnFocus: true 
+            }).showToast();
+        </script>
+    @endif
 </div>
 
 

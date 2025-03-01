@@ -10,6 +10,7 @@
 .table-responsive {
     height: calc(100vh - 84px);
     overflow-y: auto; 
+    margin-top: 12px;
 }
 
 .table {
@@ -344,13 +345,13 @@
 <div class="main-container">
 
     <div class="top-button-container">
-        <button class="btn-add-user" onclick="openUserModal()">Tambahkan Anggota</button>
-        
+        {{-- <button class="btn-add-user" onclick="openUserModal()">Tambahkan Anggota</button> --}}
+{{--         
         <form method="GET" action="{{ route('users.home') }}" style="margin: auto 0px;">
             <input type="text" name="search" placeholder="Cari berdasarkan nama atau email"
             value="{{ request('search') }}" class="form-control" 
             style="max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
-        </form>
+        </form> --}}
     </div>
 
     <div class="table-responsive">

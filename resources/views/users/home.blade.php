@@ -372,7 +372,7 @@
                         <td>{{ $user->nama }}</td>
                         <td>{{ $user->email }}</td>
                         <td>{{ $user->jabatan }}</td>
-                        <td>{{ $user->nama_dpd ?? $user->nama_dpc }}</td>
+                        <td>{{ $user->nama_dpd ?? $user->nama_dpc ?? 'Pusat' }}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="openEditModal({{ json_encode($user) }})">Edit</button>
                             <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('users.destroy', $user->id) }}')">Delete</button>

@@ -385,17 +385,19 @@
 <div class="main-container">
 
     <div class="top-button-container">
-        <a href="{{ route('anggota.create') }}" class="btn-add-user">Tambahkan Anggota</a>
-        
+        @if (Auth::user()->jabatan != 'DPP' && Auth::user()->jabatan != 'DPC')
+            <a href="{{ route('anggota.create') }}" class="btn-add-user">Tambahkan Anggota</a>
+        @endif
+        <p class="hidden"></p>
         <div class="search-container">  
             <a href="{{ route('download.dpd') }}" class="btn-add-user">Download List DPD</a>
             <a href="{{ route('download.dpc') }}" class="btn-add-user">Download List DPC</a>
             <a href="{{ route('download.csv') }}" class="btn-add-user">Download List Anggota</a>
 
             <form method="GET" action="{{ route('anggota.home') }}" style="margin: auto 0px;">
-                <input type="text" name="search" placeholder="Cari berdasarkan nama atau email"
+                <input type="text" name="search" placeholder="Cari berdasarkan nama, email, telp, nik, dpd/dpc"
                 value="{{ request('search') }}" class="form-control" 
-                style="max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
+                style="width: 350px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
             </form>
         </div>
         

@@ -235,7 +235,7 @@
 
                 if (decodedText !== lastResult) {
                     console.log("Scanned QR Code:", decodedText);
-                    window.open(decodedText, '_blank');
+                    window.open(decodedText);
 
                     lastResult = decodedText;
                 } else {
@@ -254,7 +254,7 @@
             const userId = document.getElementById('userId').value.trim();
             if (userId) {
                 const url = `/show/anggota/${userId}`;
-                window.open(url, '_blank');
+                window.open(url);
                 
                 // Clear the input field after submission
                 document.getElementById('userId').value = '';

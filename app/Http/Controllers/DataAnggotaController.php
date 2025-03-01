@@ -17,39 +17,46 @@ use Illuminate\Support\Facades\Response;
 
 class DataAnggotaController extends Controller
 {
-    
     public function index(Request $request)
     {   
-        
         $search = $request->query('search');
+        $query = DataAnggota::query()
+            ->leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
+            ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
+            ->select('data_anggota.*', 'dpd.nama_dpd', 'dpc.nama_dpc');
 
-        $query = DataAnggota::query();
-        
+        // Filtering based on user role
         if (auth()->user()->jabatan == 'DPD') {
-            $query->where('dpd_id', '=', auth()->user()->dpd_id);
-        } else if (auth()->user()->jabatan == 'DPC' || auth()->user()->jabatan == 'DPAC') {
-            $query->where('dpc_id', '=', auth()->user()->dpc_id);
+            // Get all DPC IDs under the user's DPD
+            $dpcIds = Dpc::where('dpd_id', auth()->user()->dpd_id)->pluck('id')->toArray();
+
+            // Retrieve data_anggota belonging to either DPD or DPC
+            $query->where(function ($q) use ($dpcIds) {
+                $q->where('data_anggota.dpd_id', auth()->user()->dpd_id)
+                ->orWhereIn('data_anggota.dpc_id', $dpcIds);
+            });
+        } elseif (auth()->user()->jabatan == 'DPC' || auth()->user()->jabatan == 'DPAC') {
+            $query->where('data_anggota.dpc_id', auth()->user()->dpc_id);
         }
 
+        // Search functionality
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('Nama_Lengkap', 'LIKE', "%{$search}%")
-                  ->orWhere('Email', 'LIKE', "%{$search}%")
-                  ->orWhere('id', 'LIKE', "%{$search}%");
+                ->orWhere('Email', 'LIKE', "%{$search}%")
+                ->orWhere('data_anggota.id', 'LIKE', "%{$search}%")
+                ->orWhere('ID_Kartu', 'LIKE', "%{$search}%")
+                ->orWhere('NIK', 'LIKE', "%{$search}%")
+                ->orWhere('dpd.nama_dpd', 'LIKE', "%{$search}%")
+                ->orWhere('dpc.nama_dpc', 'LIKE', "%{$search}%");
             });
         }
-
-        $query->leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
-              ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
-              ->select('data_anggota.*', 'dpd.nama_dpd', 'dpc.nama_dpc');
-
-
 
         $anggotas = $query->paginate(10);
 
         return view('anggota.home', compact('anggotas', 'search'));
-    }   
-    
+    }
+
     public function detail($id)
     {
         $anggota = DataAnggota::where('data_anggota.id', $id)
@@ -63,7 +70,6 @@ class DataAnggotaController extends Controller
         return view('anggota.detail', compact('anggota', 'dpc'));
     }
 
-
     public function destroy($id)
     {
         $anggota = DataAnggota::findOrFail($id);
@@ -71,6 +77,15 @@ class DataAnggotaController extends Controller
         if ($anggota->image_link) {
             Storage::disk('public')->delete($anggota->image_link);
         }
+
+        InformasiAkses::create([
+            'type' => 'delete',
+            'user_id' => Auth::id(),
+            'keterangan' => 'Data anggota ' . $anggota->id . ' dihapus',
+            'nama_penginput' => Auth::user()->name ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
 
         $anggota->delete();
 
@@ -152,8 +167,7 @@ class DataAnggotaController extends Controller
         InformasiAkses::create([
             'type' => 'create',
             'user_id' => Auth::id(),
-            'id_anggota' => $anggota->id,
-            'keterangan' => $validated['keterangan'] ?? 'Data anggota baru ditambahkan',
+            'keterangan' => $validated['keterangan'] ?? 'Data anggota baru ditambahkan dengan id ' . $anggota->id,
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
             'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->jabatan ?? 'Unknown',
             'created_at' => now(), // Manually set 'created_at'
@@ -232,8 +246,7 @@ class DataAnggotaController extends Controller
         InformasiAkses::create([
             'type' => 'update',
             'user_id' => Auth::id(),
-            'id_anggota' => $anggota->id,
-            'keterangan' => $validated['keterangan'] ?? 'Update Data anggota',
+            'keterangan' => $validated['keterangan'] ?? 'Update Data anggota' . $id_anggota,
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
             'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->jabatan ?? 'Unknown',
             'created_at' => now(), 
@@ -250,6 +263,7 @@ class DataAnggotaController extends Controller
         $query = DataAnggota::leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
             ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
             ->select(
+                'data_anggota.id',
                 'data_anggota.ID_Kartu',
                 'data_anggota.NIK',
                 'data_anggota.Nama_Lengkap',
@@ -276,10 +290,18 @@ class DataAnggotaController extends Controller
                 'data_anggota.created_at'
             );
 
+        // Filtering based on user role
         if (auth()->user()->jabatan == 'DPD') {
-            $query->where('dpd_id', '=', auth()->user()->dpd_id);
-        } else if (auth()->user()->jabatan == 'DPC' || auth()->user()->jabatan == 'DPAC') {
-            $query->where('dpc_id', '=', auth()->user()->dpc_id);
+            // Get all DPC IDs under the user's DPD
+            $dpcIds = Dpc::where('dpd_id', auth()->user()->dpd_id)->pluck('id')->toArray();
+
+            // Retrieve data_anggota belonging to either DPD or DPC
+            $query->where(function ($q) use ($dpcIds) {
+                $q->where('data_anggota.dpd_id', auth()->user()->dpd_id)
+                ->orWhereIn('data_anggota.dpc_id', $dpcIds);
+            });
+        } elseif (auth()->user()->jabatan == 'DPC' || auth()->user()->jabatan == 'DPAC') {
+            $query->where('data_anggota.dpc_id', auth()->user()->dpc_id);
         }
 
 
@@ -298,7 +320,7 @@ class DataAnggotaController extends Controller
 
             // Add CSV header row
             fputcsv($file, [
-                'ID Kartu', 'NIK', 'Nama Lengkap', 'Nama Buddhis', 'Jenis Kelamin',
+                'ID Anggota','ID Kartu', 'NIK', 'Nama Lengkap', 'Nama Buddhis', 'Jenis Kelamin',
                 'Kota Lahir', 'Tanggal Lahir', 'Golongan Darah', 'Gelar Akademis', 
                 'Profesi', 'Email', 'No HP', 'Alamat', 'Status Kartu', 
                 'Mengenal Patria Dari', 'Histori Patria', 'Pernah Mengikuti PBT',
@@ -308,6 +330,7 @@ class DataAnggotaController extends Controller
             // Add each anggota row to CSV
             foreach ($anggota as $row) {
                 fputcsv($file, [
+                    $row->id,
                     $row->ID_Kartu,
                     $row->NIK,
                     $row->Nama_Lengkap,
@@ -347,7 +370,6 @@ class DataAnggotaController extends Controller
                         ->orWhere('ID_Kartu', $idOrCardId)
                         ->firstOrFail();
 
-            // dd($anggota);
             return view('anggota.show', compact('anggota'));
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return redirect()->back()->with('error', 'User not found. Please try again.');
@@ -383,34 +405,34 @@ class DataAnggotaController extends Controller
         return redirect()->back()->with('success', 'Images uploaded successfully!');
     }
 
-    public function search(Request $request)
-    {
-        $validatedData = $request->validate([
-            'userId' => 'required|integer|exists:users,user_id',
-        ]);
+    // public function search(Request $request)
+    // {
+    //     $validatedData = $request->validate([
+    //         'userId' => 'required|integer|exists:users,user_id',
+    //     ]);
 
-        return redirect()->route('users.show', $validatedData['userId']);
-    }
+    //     return redirect()->route('users.show', $validatedData['userId']);
+    // }
         
     public function template()
     {
         $headers = [
-            'ID_Kartu', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
+            'ID_Kartu (kosongkan saja apabila tidak perlu)', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
             'Email', 'No_HP', 'Jenis_Kelamin', 'Alamat', 'Kota_Lahir', 'Tanggal_Lahir',
-            'Golongan_Darah', 'img_link (biarkan kosong)', 'Mengenal_Patria_Dari', 'Histori_Patria',
-            'Pernah_Mengikuti_PBT', 'dpd_id(lihat dari data dpd)', 'dpc_id(lihat dari data dpc)'
+            'Golongan_Darah', 'img_link (biarkan kosong)', 'Status_Kartu', 'Mengenal_Patria_Dari', 'Histori_Patria',
+            'Pernah_Mengikuti_PBT', 'kode_dpd(lihat dari data dpd)', 'kode_dpc(lihat dari data dpc)'
         ];
 
         $exampleRow1 = [
-            'id kartu anggota 1', '1234567890123456', 'Jane Doe', 'Nama Buddhis', 'S.Kom', 'Software Engineer',
+            '', '1234567890123456', 'Jane Doe', 'Nama Buddhis', 'S.Kom', 'Software Engineer',
             'johndoe@example.com', '08123456789', 'Laki-Laki', 'Jl. Contoh No. 123', 'Jakarta', '1990-01-01',
-            'A', '', 'Teman', 'Pernah ikut acara', '1', '1', ''
+            'A', '', 'belum_cetak', 'Teman', 'Pernah ikut acara', '1', '12', ''
         ];
 
         $exampleRow2 = [
-            'id kartu anggota 2', '9876543210987654', 'Jane Smith', 'Nama Buddhis 2', 'M.M', 'Data Analyst',
+            '', '9876543210987654', 'Jane Smith', 'Nama Buddhis 2', 'M.M', 'Data Analyst',
             'aniwijaya@example.com', '081298765432', 'Perempuan', 'Jl. Contoh No. 456', 'Bandung', '1995-05-15',
-            'B', '', 'Sosial Media', 'Ikut kegiatan', '0', '', '2'
+            'B', '', 'sudah_cetak', 'Sosial Media', 'Ikut kegiatan', '0', '', '1201'
         ];
 
         // Convert array to CSV format
@@ -443,20 +465,21 @@ class DataAnggotaController extends Controller
         $expectedHeaders = [
             'ID_Kartu', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
             'Email', 'No_HP', 'Jenis_Kelamin', 'Alamat', 'Kota_Lahir', 'Tanggal_Lahir',
-            'Golongan_Darah', 'img_link (biarkan kosong)', 'Mengenal_Patria_Dari', 'Histori_Patria',
-            'Pernah_Mengikuti_PBT', 'dpd_id(lihat dari data dpd)', 'dpc_id(lihat dari data dpc)'
+            'Golongan_Darah', 'img_link (biarkan kosong)','Status_Kartu', 'Mengenal_Patria_Dari', 'Histori_Patria',
+            'Pernah_Mengikuti_PBT', 'kode_dpd(lihat dari data dpd)', 'kode_dpc(lihat dari data dpc)'
         ];
 
         if ($headers !== $expectedHeaders) {
             return back()->withErrors(['file' => 'Format CSV tidak sesuai.']);
         }
+        // dd($headers);
 
         $dataToInsert = [];
         $now = now();
-        
+        // dd($file);
         while (($row = fgetcsv($handle, 1000, ';')) !== false) {
-            $dpd_id = !empty($row[17]) ? (int) $row[17] : null;
-            $dpc_id = !empty($row[18]) ? (int) $row[18] : null;
+            $dpd_id = !empty($row[18]) ? DPD::where('kode_daerah', $row[18])->value('id') : null;
+            $dpc_id = !empty($row[19]) ? DPC::where('kode_daerah', $row[19])->value('id') : null;
 
             if (!$dpd_id && !$dpc_id) {
                 continue; // Skip if neither dpd_id nor dpc_id is provided
@@ -500,10 +523,11 @@ class DataAnggotaController extends Controller
                 'Kota_Lahir' => $row[10] ?? null,
                 'Tanggal_Lahir' => $tanggalLahir,
                 'Golongan_Darah' => $row[12] ?? null,
-                'Mengenal_Patria_Dari' => $row[14] ?? null,
-                'Histori_Patria' => $row[15] ?? null,
+                'Status_Kartu' => $row[14] ?? null,
+                'Mengenal_Patria_Dari' => $row[15] ?? null,
+                'Histori_Patria' => $row[16] ?? null,
                 'img_link'=> 'uploads/anggota/' . $id_anggota . '.png',
-                'Pernah_Mengikuti_PBT' => filter_var($row[16], FILTER_VALIDATE_BOOLEAN),
+                'Pernah_Mengikuti_PBT' => filter_var($row[17], FILTER_VALIDATE_BOOLEAN),
                 'dpd_id' => $dpd_id,
                 'dpc_id' => $dpc_id,
             ];
@@ -518,8 +542,7 @@ class DataAnggotaController extends Controller
                 InformasiAkses::create([
                     'type' => 'create',
                     'user_id' => Auth::id(),
-                    'id_anggota' => $anggota->id, // Store the newly created anggota ID
-                    'keterangan' => $request->keterangan ?? 'Data anggota baru ditambahkan',
+                    'keterangan' => $request->keterangan . ' anggota id ' . $anggota->id ?? 'Data anggota baru ditambahkan (upload csv) ' . $anggota->id,
                     'nama_penginput' => $request->nama_penginput ?? Auth::user()->name ?? 'Unknown',
                     'jabatan_penginput' => $request->jabatan_penginput ?? Auth::user()->jabatan ?? 'Unknown',
                     'created_at' => now(),

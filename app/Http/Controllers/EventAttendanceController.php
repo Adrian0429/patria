@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Event;
 use App\Models\Attendance;
 use App\Models\DataAnggota;
+use App\Models\InformasiAkses;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
@@ -19,7 +21,7 @@ class EventAttendanceController extends Controller
         $search = $request->query('search'); // Capture the search query
 
         // Initialize the query
-        if ($user->jabatan === 'admin') {
+        if ($user->jabatan === 'admin' || $user->jabatan === 'DPP') {
             $query = Event::query()
                 ->select('events.*', 'users.nama', 'users.jabatan', 'dpd.nama_dpd', 'dpc.nama_dpc')
                 ->join('users', 'events.user_id', '=', 'users.id')
@@ -66,12 +68,22 @@ class EventAttendanceController extends Controller
         // Debugging: Check if user_id is correctly retrieved
         \Log::info('Creating Event', ['user_id' => auth()->user()->id]);
 
-        Event::create([
+        $event = Event::create([
             'nama_event' => $validated['nama_event'],
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
             'user_id' => auth()->user()->id,
         ]);
+
+        InformasiAkses::create([
+            'type' => 'create',
+            'keterangan' => 'data event ' . $event->nama_event . ' dibuat',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+
 
         return redirect()->route('events.index')->with('success', 'Event created successfully!');
     }
@@ -115,6 +127,17 @@ class EventAttendanceController extends Controller
 
         $event->update($data);
 
+
+        InformasiAkses::create([
+            'type' => 'update',
+            'keterangan' => 'data event ' . $event->nama_event . ' dirubah',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+
+
         return redirect()->route('events.index')->with('success', 'Event updated successfully!');
     }
 
@@ -128,6 +151,16 @@ class EventAttendanceController extends Controller
     {
         $event = Event::findOrFail($id);
         $event->delete();
+
+
+        InformasiAkses::create([
+            'type' => 'delete',
+            'keterangan' => 'data event' . $event->nama_event . ' dihapus',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
 
         return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
     }

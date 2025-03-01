@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\DPD;
 use App\Models\DPC;
+use App\Models\InformasiAkses;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -32,6 +33,17 @@ class UserController extends Controller
             'kode_daerah' => 'required|string|max:50',
         ]);
 
+
+        InformasiAkses::create([
+            'type' => 'create',
+            'user_id' => Auth::id(),
+            'keterangan' => 'Data DPD baru ditambahkan dengan kode daerah ' . $request->input('kode_daerah'),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+
+
         DPD::create($request->all());
         return redirect()->route('users.index_dpd')->with('success', 'DPD berhasil ditambahkan.');
     }
@@ -39,14 +51,25 @@ class UserController extends Controller
     /**
      * Update the specified DPP in storage.
      */
+
     public function update_dpd(Request $request, $id)
     {
         $request->validate([
             'nama_dpd' => 'required|string|max:255',
-            'kode_daerah' => 'required|string|max:50',
+            'kode_daerah' => 'required|string|max:50|unique:dpd,kode_daerah,' . $id,
         ]);
 
         $dpp = DPD::findOrFail($id);
+
+        InformasiAkses::create([
+            'type' => 'update',
+            'keterangan' => 'Data DPD kode ' . $dpp->kode_daerah . ' dirubah',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+        
         $dpp->update($request->all());
 
         return redirect()->route('users.index_dpd')->with('success', 'DPD berhasil dirubah.');
@@ -58,6 +81,15 @@ class UserController extends Controller
     public function destroy_dpd($id)
     {
         $dpp = DPD::findOrFail($id);
+        InformasiAkses::create([
+            'type' => 'delete',
+            'keterangan' => 'Data DPD kode ' . $dpp->kode_daerah . ' dihapus',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+        
         $dpp->delete();
 
         return redirect()->route('users.index_dpd')->with('success', 'DPC berhasil dihapus.');
@@ -87,6 +119,15 @@ class UserController extends Controller
             'kode_daerah' => 'required|string|max:50',
         ]);
 
+        InformasiAkses::create([
+            'type' => 'create',
+            'keterangan' => 'Data DPC kode ' . $request->input('kode_daerah') . ' ditambahkan',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+        
         DPC::create($request->all());
 
         return redirect()->route('users.index_dpc')->with('success', 'DPC berhasil ditambahkan.');
@@ -104,6 +145,15 @@ class UserController extends Controller
         ]);
 
         $dpc = DPC::findOrFail($id);
+        InformasiAkses::create([
+            'type' => 'update',
+            'keterangan' => 'Data DPC kode ' . $dpc->kode_daerah . ' dirubah',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+        
         $dpc->update($request->all());
 
         return redirect()->route('users.index_dpc')->with('success', 'DPC berhasil diperbarui.');
@@ -112,6 +162,16 @@ class UserController extends Controller
     public function destroy_dpc($id)
     {
         $dpc = DPC::findOrFail($id);
+
+         InformasiAkses::create([
+            'type' => 'delete',
+            'keterangan' => 'Data DPC kode ' . $dpc->kode_daerah . ' dihapus',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+
         $dpc->delete();
 
         return redirect()->route('users.index_dpc')->with('success', 'DPC berhasil dihapus.');
@@ -139,6 +199,47 @@ class UserController extends Controller
         return view('users.home', compact('users', 'dpds', 'dpcs', 'search'));
     }
     
+    public function store(Request $request)
+    {
+        $data = $request->all();
+
+        // Convert empty string values to null
+        $data['dpd_id'] = $data['dpd_id'] === "" ? null : $data['dpd_id'];
+        $data['dpc_id'] = $data['dpc_id'] === "" ? null : $data['dpc_id'];
+
+        $validatedData = Validator::make($data, [
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6',
+            'jabatan' => 'required|in:admin,DPP,DPD,DPC,DPAC',
+            'dpd_id' => 'nullable|exists:dpd,id',
+            'dpc_id' => 'nullable|exists:dpc,id',
+        ])->validate();
+
+        // Create new user
+        $user = User::create([
+            'nama' => $validatedData['nama'],
+            'email' => $validatedData['email'],
+            'jabatan' => $validatedData['jabatan'],
+            'dpd_id' => $validatedData['dpd_id'],
+            'dpc_id' => $validatedData['dpc_id'],
+            'password' => Hash::make($validatedData['password']),
+        ]);
+
+         InformasiAkses::create([
+            'type' => 'update',
+            'keterangan' => 'Data Akun kode akun ' . $user->id . ' dibuat',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+
+        return redirect()->route('users.home')->with('success', 'User created successfully.');
+    }
+
+
+
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -168,14 +269,33 @@ class UserController extends Controller
             'password' => $validatedData['password'] ? Hash::make($validatedData['password']) : $user->password, // Only update if new password is provided
         ]);
 
+        InformasiAkses::create([
+            'type' => 'update',
+            'keterangan' => 'Data Akun kode akun ' . $user->id . ' dirubah',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+
+
         return redirect()->route('users.home')->with('success', 'User updated successfully.');
     }
-
 
     public function destroy($id)
     {
         $user = User::findOrFail($id);
         $user->delete();
+
+        InformasiAkses::create([
+            'type' => 'update',
+            'keterangan' => 'Data Akun kode akun ' . $user->id . ' dihapus',
+            'user_id' => Auth::id(),
+            'nama_penginput' => Auth::user()->nama ?? 'Unknown',
+            'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',
+            'created_at' => now(), // Manually set 'created_at'
+        ]);
+
 
         return redirect()->route('users.home')->with('success', 'User deleted successfully.');
     }

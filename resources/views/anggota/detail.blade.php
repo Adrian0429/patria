@@ -366,7 +366,8 @@
             @endif
         </div>
 
-        <div class="detail-actions">
+        @if (Auth::user()->jabatan != 'DPP' && Auth::user()->jabatan != 'DPAC')
+           <div class="detail-actions">
             <a href="{{ route('anggota.edit', $anggota->id) }}" class="btn btn-edit">
                 Edit Data
             </a>
@@ -376,6 +377,7 @@
             <button class="btn btn-primary" onclick="openPindahModal()">Pindah DPC</button>
 
         </div>
+        @endif
     </div>
 </div>
 

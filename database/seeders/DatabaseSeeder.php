@@ -160,7 +160,6 @@ class DatabaseSeeder extends Seeder
             [
                 'nama' => 'Sekretariat DPP',
                 'jabatan' => 'DPP',
-                'dpd_id' => 7,
                 'email' => 'sekretariat.dpp@patria.or.id',
                 'password' => Hash::make('admin12345'),
                 'created_at' => now(),
@@ -169,7 +168,6 @@ class DatabaseSeeder extends Seeder
             [
                 'nama' => 'Sekretaris',
                 'jabatan' => 'admin',
-                 'dpd_id' => 7,
                 'email' => 'sekretaris@patria.or.id',
                 'password' => Hash::make('admin12345'),
                 'created_at' => now(),
@@ -178,17 +176,26 @@ class DatabaseSeeder extends Seeder
             [
                 'nama' => 'Sekretaris Umum',
                 'jabatan' => 'admin',
-                 'dpd_id' => 7,
                 'email' => 'sekretaris.umum@patria.or.id',
                 'password' => Hash::make('admin12345'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
             [
-                'nama' => 'Sekretariat DPC JAKUT',
+                'nama' => 'Sekretariat DPD JATENG',
+                'jabatan' => 'DPD',
+                'dpd_id' => 9,
+                'email' => 'sekretariat.dpd.jateng@patria.or.id',
+                'password' => Hash::make('admin12345'),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+
+            [
+                'nama' => 'Sekretariat DPC SEMARANG KOTA',
                 'jabatan' => 'DPC',
-                'dpc_id' => 15,
-                'email' => 'sekretariat.dpc.jakut@patria.or.id',
+                'dpc_id' => 26,
+                'email' => 'sekretariat.dpc.semarang@patria.or.id',
                 'password' => Hash::make('admin12345'),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -201,8 +208,8 @@ class DatabaseSeeder extends Seeder
         
         DB::table('data_anggota')->insert([
             [
-                'NIK' => '1234567890123456',
-                'ID_Kartu' => '1234567890123456',
+                'NIK' => '11111111111',
+                'ID_Kartu' => 'kartu1',
                 'Nama_Lengkap' => 'John Doe',
                 'Nama_Buddhis' => 'Bhikku Ananda',
                 'Jenis_Kelamin' => 'Laki-laki',
@@ -224,8 +231,8 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'NIK' => '9876543210987654',
-                'ID_Kartu' => '0987654321',
+                'NIK' => '22222222222',
+                'ID_Kartu' => 'kartu2',
                 'Nama_Lengkap' => 'Jane Smith',
                 'Nama_Buddhis' => 'Sister Metta',
                 'Jenis_Kelamin' => 'Perempuan',

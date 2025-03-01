@@ -72,14 +72,12 @@ return new class extends Migration {
             $table->foreignId('dpd_id')->nullable()->constrained('dpd')->onDelete('cascade');
             $table->foreignId('dpc_id')->nullable()->constrained('dpc')->onDelete('cascade');
             $table->timestamps();
-            $table->softDeletes();
         });
 
         Schema::create('informasi_akses', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['create', 'read', 'update', 'delete']);
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('id_anggota')->constrained('data_anggota')->onDelete('cascade');
             $table->string('nama_penginput')->nullable();
             $table->string('jabatan_penginput')->nullable();
             $table->string('keterangan')->nullable();

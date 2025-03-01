@@ -12,7 +12,7 @@ class InformasiAkses extends Model
     protected $table = 'informasi_akses';
 
     protected $fillable = [
-        'type', 'user_id', 'id_anggota', 'keterangan', 'nama_penginput', 'jabatan_penginput'
+        'type', 'user_id', 'keterangan', 'nama_penginput', 'jabatan_penginput'
     ];
 
     public function user()
@@ -20,8 +20,4 @@ class InformasiAkses extends Model
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
-    public function dataAnggota()
-    {
-        return $this->belongsTo(DataAnggota::class, 'id_anggota', 'id');
-    }
 }
