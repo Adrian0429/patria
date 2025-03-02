@@ -463,7 +463,7 @@ class DataAnggotaController extends Controller
 
         $headers = fgetcsv($handle, 1000, ';'); // Read the header row
         $expectedHeaders = [
-            'ID_Kartu', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
+            'ID_Kartu (kosongkan saja apabila tidak perlu)', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
             'Email', 'No_HP', 'Jenis_Kelamin', 'Alamat', 'Kota_Lahir', 'Tanggal_Lahir',
             'Golongan_Darah', 'img_link (biarkan kosong)','Status_Kartu', 'Mengenal_Patria_Dari', 'Histori_Patria',
             'Pernah_Mengikuti_PBT', 'kode_dpd(lihat dari data dpd)', 'kode_dpc(lihat dari data dpc)'

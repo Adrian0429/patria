@@ -51,7 +51,7 @@ return new class extends Migration {
 
         Schema::create('data_anggota', function (Blueprint $table) {
             $table->id();
-            $table->string('ID_Kartu')->unique();
+            $table->string('ID_Kartu')->nullable();
             $table->string('NIK')->unique();
             $table->string('Nama_Lengkap');
             $table->string('Nama_Buddhis')->nullable();
