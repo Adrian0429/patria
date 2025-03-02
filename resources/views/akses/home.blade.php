@@ -358,9 +358,10 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>ID penginput</th>
                     <th>Tipe</th>
                     <th>Nama Penginput</th>
-                    <th>ID Anggota Diinput</th>
+                    <th>Nama Akun</th>
                     <th>Jabatan Penginput</th>
                     <th>Keterangan</th>
                 </tr>
@@ -368,12 +369,12 @@
             <tbody>
                 @foreach ($aksess as $akses)
                     <tr>
+                        <td>{{ $akses->user_id }}</td>
                         <td>{{ $akses->type }}</td>
                         <td>{{ $akses->nama_penginput }}</td>
-                        <td>{{ $akses->id_anggota }}</td>
-                        <td>{{ $akses->jabatan_penginput }}</td>
+                        <td>{{ $akses->nama }}</td>
+                        <td>{{ $akses->jabatan }}</td>
                         <td>{{ $akses->keterangan }}</td>
-                        
                     </tr>
                 @endforeach
             </tbody>

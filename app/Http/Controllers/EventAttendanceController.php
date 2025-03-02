@@ -239,7 +239,7 @@ class EventAttendanceController extends Controller
             ) 
             ->orderBy('attendances.created_at', 'asc')
             ->paginate(15);
-
+                
             // dd($attendances);
         return view('attendance.index', compact('attendances', 'event'));
     }
