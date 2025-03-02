@@ -385,7 +385,7 @@
 <div class="main-container">
 
     <div class="top-button-container">
-        @if (Auth::user()->jabatan != 'DPP' && Auth::user()->jabatan != 'DPC')
+        @if (Auth::user()->jabatan != 'DPP' && Auth::user()->jabatan != 'DPAC')
             <a href="{{ route('anggota.create') }}" class="btn-add-user">Tambahkan Anggota</a>
         @endif
         <p class="hidden"></p>
