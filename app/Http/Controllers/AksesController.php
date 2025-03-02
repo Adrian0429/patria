@@ -18,7 +18,7 @@ public function index(Request $request)
         ->orderBy('informasi_akses.created_at', 'desc')
         ->paginate(10);
 
-    dd($aksess);
+    // dd($aksess);
     return view('akses.home', compact('aksess'));
 }
 
