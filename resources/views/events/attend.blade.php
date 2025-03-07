@@ -200,6 +200,7 @@
                     userIdInput.value = userId;
 
                     lastResult = decodedText;
+                    document.getElementById("searchForm").submit();
                 } else {
                     console.log("Duplicate or too frequent scans ignored.");
                 }
