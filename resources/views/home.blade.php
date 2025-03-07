@@ -237,9 +237,9 @@
                     console.log("Scanned QR Code:", decodedText);
                     const urlParts = decodedText.split("/");
                     const userId = urlParts[urlParts.length - 1];
-                    
-                    const userIdInput = document.getElementById("userId");
-                    userIdInput.value = userId;
+
+                    // const userIdInput = document.getElementById("userId");
+                    // userIdInput.value = userId;
 
                     window.location.href = `/show/anggota/${userId}`;
                     
