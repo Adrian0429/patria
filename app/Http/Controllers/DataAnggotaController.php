@@ -102,7 +102,7 @@ class DataAnggotaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ID_Kartu' => 'required|unique:data_anggota,ID_Kartu,',
+            'ID_Kartu' => 'unique:data_anggota,ID_Kartu,',
             'NIK' => 'required|unique:data_anggota,NIK,',
             'Nama_Lengkap' => 'required',
             'Nama_Buddhis' => 'nullable',
