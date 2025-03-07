@@ -319,7 +319,7 @@
             <tbody>
                 @foreach ($events as $event)
                     <tr>
-                        <td>{{ $event->id }}</td>
+                        <td>{{ $event->id_anggota }}</td>
                         <td>{{ $event->nama_event }}</td>
                         <td>{{ $event->start_date }}</td>
                         <td>{{ $event->end_date }}</td>
