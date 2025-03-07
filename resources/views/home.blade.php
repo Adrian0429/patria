@@ -235,9 +235,14 @@
 
                 if (decodedText !== lastResult) {
                     console.log("Scanned QR Code:", decodedText);
-                    window.open(decodedText);
+                    const urlParts = decodedText.split("/");
+                    const userId = urlParts[urlParts.length - 1];
 
+                    const userIdInput = document.getElementById("userId");
+                    userIdInput.value = userId;
+                    
                     lastResult = decodedText;
+                    document.getElementById("searchForm").submit();
                 } else {
                     console.log("Duplicate or too frequent scans ignored.");
                 }
