@@ -238,11 +238,12 @@
                     const urlParts = decodedText.split("/");
                     const userId = urlParts[urlParts.length - 1];
 
-                    const userIdInput = document.getElementById("userId");
-                    userIdInput.value = userId;
+                    window.open(`/show/anggota/${userId}`);
+                    // const userIdInput = document.getElementById("userId");
+                    // userIdInput.value = userId;
                     
-                    lastResult = decodedText;
-                    document.getElementById("searchForm").submit();
+                    // lastResult = decodedText;
+                    
                 } else {
                     console.log("Duplicate or too frequent scans ignored.");
                 }
