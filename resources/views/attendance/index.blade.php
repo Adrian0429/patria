@@ -264,7 +264,7 @@
                     <th>Nama Anggota</th>
                     <th>Email Anggota</th>
                     <th>Tanggal Absen</th>
-                    <th>aksi</th>
+                    {{-- <th>aksi</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -274,9 +274,9 @@
                         <td>{{ $attendance->nama_anggota }}</td>
                         <td>{{ $attendance->email_anggota }}</td>
                         <td>{{ $attendance->created_at }}</td>
-                        <td>
+                        {{-- <td>
                             <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('attendance.delete', $attendance->id) }}')">Delete</button>
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
             </tbody>
