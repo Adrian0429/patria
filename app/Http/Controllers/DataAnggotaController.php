@@ -167,7 +167,7 @@ class DataAnggotaController extends Controller
         InformasiAkses::create([
             'type' => 'create',
             'user_id' => Auth::id(),
-            'keterangan' => $validated['keterangan'] ?? 'Data anggota baru ditambahkan dengan id ' . $anggota->id,
+            'keterangan' => $validated['keterangan'] . 'pada data anggota id ' . $id_anggota ?? 'Data anggota baru ditambahkan dengan id ' . $anggota->id,
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
             'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->jabatan ?? 'Unknown',
             'created_at' => now(), // Manually set 'created_at'
@@ -246,7 +246,7 @@ class DataAnggotaController extends Controller
         InformasiAkses::create([
             'type' => 'update',
             'user_id' => Auth::id(),
-            'keterangan' => $validated['keterangan'] . "pada data anggota ID" . $id_anggota ?? 'Update Data anggota' . $id_anggota,
+            'keterangan' => $validated['keterangan'] . " pada data anggota ID" . $id_anggota ?? 'Update Data anggota' . $id_anggota,
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
             'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->jabatan ?? 'Unknown',
             'created_at' => now(), 
