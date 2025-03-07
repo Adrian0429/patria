@@ -244,7 +244,7 @@
                     window.location.href = `/show/anggota/${userId}`;
                     
                     
-                    // lastResult = decodedText;
+                    lastResult = decodedText;
                     
                 } else {
                     console.log("Duplicate or too frequent scans ignored.");
