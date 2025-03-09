@@ -69,14 +69,13 @@ return new class extends Migration {
             $table->text('Mengenal_Patria_Dari')->nullable();
             $table->text('Histori_Patria')->nullable();
             $table->boolean('Pernah_Mengikuti_PBT')->default(false);
-            $table->foreignId('dpd_id')->nullable()->constrained('dpd')->onDelete('cascade');
             $table->foreignId('dpc_id')->nullable()->constrained('dpc')->onDelete('cascade');
             $table->timestamps();
         });
 
         Schema::create('informasi_akses', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['create', 'read', 'update', 'delete']);
+            $table->string('type');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('nama_penginput')->nullable();
             $table->string('jabatan_penginput')->nullable();

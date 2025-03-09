@@ -35,7 +35,7 @@ class UserController extends Controller
 
 
         InformasiAkses::create([
-            'type' => 'create',
+            'type' => 'Create Data DPD',
             'user_id' => Auth::id(),
             'keterangan' => 'Data DPD baru ditambahkan dengan kode daerah ' . $request->input('kode_daerah'),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -62,7 +62,7 @@ class UserController extends Controller
         $dpp = DPD::findOrFail($id);
 
         InformasiAkses::create([
-            'type' => 'update',
+            'type' => 'Update Data DPD',
             'keterangan' => 'Data DPD kode ' . $dpp->kode_daerah . ' dirubah',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -82,7 +82,7 @@ class UserController extends Controller
     {
         $dpp = DPD::findOrFail($id);
         InformasiAkses::create([
-            'type' => 'delete',
+            'type' => 'Delete Data DPD',
             'keterangan' => 'Data DPD kode ' . $dpp->kode_daerah . ' dihapus',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -120,7 +120,7 @@ class UserController extends Controller
         ]);
 
         InformasiAkses::create([
-            'type' => 'create',
+            'type' => 'Create Data DPC',
             'keterangan' => 'Data DPC kode ' . $request->input('kode_daerah') . ' ditambahkan',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -146,7 +146,7 @@ class UserController extends Controller
 
         $dpc = DPC::findOrFail($id);
         InformasiAkses::create([
-            'type' => 'update',
+            'type' => 'Update Data DPC',
             'keterangan' => 'Data DPC kode ' . $dpc->kode_daerah . ' dirubah',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -164,7 +164,7 @@ class UserController extends Controller
         $dpc = DPC::findOrFail($id);
 
          InformasiAkses::create([
-            'type' => 'delete',
+            'type' => 'Delete Data DPC',
             'keterangan' => 'Data DPC kode ' . $dpc->kode_daerah . ' dihapus',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -227,7 +227,7 @@ class UserController extends Controller
         ]);
 
          InformasiAkses::create([
-            'type' => 'update',
+            'type' => 'Create Akun',
             'keterangan' => 'Data Akun kode akun ' . $user->id . ' dibuat',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -270,7 +270,7 @@ class UserController extends Controller
         ]);
 
         InformasiAkses::create([
-            'type' => 'update',
+            'type' => 'Update Akun',
             'keterangan' => 'Data Akun kode akun ' . $user->id . ' dirubah',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -288,7 +288,7 @@ class UserController extends Controller
         $user->delete();
 
         InformasiAkses::create([
-            'type' => 'update',
+            'type' => 'Delete Akun',
             'keterangan' => 'Data Akun kode akun ' . $user->id . ' dihapus',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',

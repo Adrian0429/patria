@@ -354,6 +354,14 @@
                     <div class="detail-label">Pernah Mengikuti PBT</div>
                     <div class="detail-value">{{ $anggota->Pernah_Mengikuti_PBT ? 'Ya' : 'Tidak' }}</div>
                 </div>
+                <div class="detail-item">
+                    <div class="detail-label">Created Date</div>
+                    <div class="detail-value">{{ $anggota->created_at ?? '-' }}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Last Edited</div>
+                    <div class="detail-value">{{ $anggota->updated_at ?? '-' }}</div>
+                </div>
             </div>
         </div>
 

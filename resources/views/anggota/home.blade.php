@@ -425,7 +425,7 @@
                         <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->Email }}</td>
                         <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->No_HP }}</td>
                         <td class="status-badge" onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'"><p class="text-status {{ $anggota->Status_Kartu == 'sudah_cetak' ? 'status-sudah' : 'status-belum' }}">{{ str_replace('_', ' ', ucfirst($anggota->Status_Kartu)) }}</p></td>
-                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{ $anggota->nama_dpd ?? $anggota->nama_dpc }}</td>
+                        <td onclick="window.location='{{ route('anggota.detail', $anggota->id) }}'">{{$anggota->nama_dpc }}</td>
                     </tr>
                 @endforeach
             </tbody>

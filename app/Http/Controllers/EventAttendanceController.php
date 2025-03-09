@@ -76,7 +76,7 @@ class EventAttendanceController extends Controller
         ]);
 
         InformasiAkses::create([
-            'type' => 'create',
+            'type' => 'Create Event',
             'keterangan' => 'data event ' . $event->nama_event . ' dibuat',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -129,7 +129,7 @@ class EventAttendanceController extends Controller
 
 
         InformasiAkses::create([
-            'type' => 'update',
+            'type' => 'Update Event',
             'keterangan' => 'data event ' . $event->nama_event . ' dirubah',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
@@ -154,8 +154,8 @@ class EventAttendanceController extends Controller
 
 
         InformasiAkses::create([
-            'type' => 'delete',
-            'keterangan' => 'data event' . $event->nama_event . ' dihapus',
+            'type' => 'Delete Event',
+            'keterangan' => 'data event ' . $event->nama_event . ' dihapus',
             'user_id' => Auth::id(),
             'nama_penginput' => Auth::user()->nama ?? 'Unknown',
             'jabatan_penginput' => Auth::user()->jabatan ?? 'Unknown',

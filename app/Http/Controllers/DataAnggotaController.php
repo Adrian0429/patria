@@ -21,9 +21,8 @@ class DataAnggotaController extends Controller
     {   
         $search = $request->query('search');
         $query = DataAnggota::query()
-            ->leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
             ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
-            ->select('data_anggota.*', 'dpd.nama_dpd', 'dpc.nama_dpc');
+            ->select('data_anggota.*', 'dpc.nama_dpc');
 
         // Filtering based on user role
         if (auth()->user()->jabatan == 'DPD') {
@@ -32,8 +31,7 @@ class DataAnggotaController extends Controller
 
             // Retrieve data_anggota belonging to either DPD or DPC
             $query->where(function ($q) use ($dpcIds) {
-                $q->where('data_anggota.dpd_id', auth()->user()->dpd_id)
-                ->orWhereIn('data_anggota.dpc_id', $dpcIds);
+                $q->where('data_anggota.dpc_id', $dpcIds);
             });
         } elseif (auth()->user()->jabatan == 'DPC' || auth()->user()->jabatan == 'DPAC') {
             $query->where('data_anggota.dpc_id', auth()->user()->dpc_id);
@@ -47,7 +45,6 @@ class DataAnggotaController extends Controller
                 ->orWhere('data_anggota.id', 'LIKE', "%{$search}%")
                 ->orWhere('ID_Kartu', 'LIKE', "%{$search}%")
                 ->orWhere('NIK', 'LIKE', "%{$search}%")
-                ->orWhere('dpd.nama_dpd', 'LIKE', "%{$search}%")
                 ->orWhere('dpc.nama_dpc', 'LIKE', "%{$search}%");
             });
         }
@@ -60,9 +57,8 @@ class DataAnggotaController extends Controller
     public function detail($id)
     {
         $anggota = DataAnggota::where('data_anggota.id', $id)
-            ->leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
             ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
-            ->select('data_anggota.*', 'dpd.nama_dpd', 'dpc.nama_dpc')
+            ->select('data_anggota.*', 'dpc.nama_dpc')
             ->firstOrFail(); 
         
         $dpc = DPC::all();
@@ -79,7 +75,7 @@ class DataAnggotaController extends Controller
         }
 
         InformasiAkses::create([
-            'type' => 'delete',
+            'type' => 'Delete Anggota',
             'user_id' => Auth::id(),
             'keterangan' => 'Data anggota ' . $anggota->id . ' dihapus',
             'nama_penginput' => Auth::user()->name ?? 'Unknown',
@@ -119,8 +115,7 @@ class DataAnggotaController extends Controller
             'Mengenal_Patria_Dari' => 'nullable',
             'Histori_Patria' => 'nullable',
             'Pernah_Mengikuti_PBT' => 'boolean',
-            'dpd_id' => 'nullable|exists:dpd,id',
-            'dpc_id' => 'nullable|exists:dpc,id',
+            'dpc_id' => '',
             'nama_penginput' => 'required',
             'jabatan_penginput' => 'required',
             'Status_Kartu' => 'required|in:belum_cetak,sudah_cetak',
@@ -128,14 +123,7 @@ class DataAnggotaController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:6048',
         ]);
 
-        if ($request->filled('dpd_id')) {
-            $kodeWilayah = DPD::where('id', $request->dpd_id)->value('kode_daerah');
-        } elseif ($request->filled('dpc_id')) {
-            $kodeWilayah = DPC::where('id', $request->dpc_id)->value('kode_daerah');
-        } else {
-            return back()->withErrors(['dpd_id' => 'Kode wilayah tidak ditemukan.']);
-        }
-
+        $kodeWilayah = DPC::where('id', $request->dpc_id)->value('kode_daerah');
         // Get last 2 digits of the current year
         $tahun = date('y');
 
@@ -165,7 +153,7 @@ class DataAnggotaController extends Controller
         $anggota = DataAnggota::create($validated);
 
         InformasiAkses::create([
-            'type' => 'create',
+            'type' => 'Create Anggota',
             'user_id' => Auth::id(),
             'keterangan' => $validated['keterangan'] . 'pada data anggota id ' . $id_anggota ?? 'Data anggota baru ditambahkan dengan id ' . $anggota->id,
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
@@ -182,7 +170,6 @@ class DataAnggotaController extends Controller
         $dpds = Dpd::all();
         $dpcs = Dpc::all();
 
-        
         return view('anggota.edit', compact('anggota', 'dpds', 'dpcs'));
     }
 
@@ -209,7 +196,6 @@ class DataAnggotaController extends Controller
             'Mengenal_Patria_Dari' => 'nullable|string',
             'Histori_Patria' => 'nullable|string',
             'Pernah_Mengikuti_PBT' => 'nullable|boolean',
-            'dpd_id' => 'nullable|exists:dpd,id',
             'dpc_id' => 'nullable|exists:dpc,id',
             'nama_penginput' => 'nullable|string',
             'jabatan_penginput' => 'nullable|string',
@@ -244,9 +230,9 @@ class DataAnggotaController extends Controller
 
         // Log InformasiAkses update
         InformasiAkses::create([
-            'type' => 'update',
+            'type' => 'Update Anggota',
             'user_id' => Auth::id(),
-            'keterangan' => $validated['keterangan'] . " pada data anggota ID" . $id_anggota ?? 'Update Data anggota' . $id_anggota,
+            'keterangan' => $validated['keterangan'] . " pada data anggota ID " . $id_anggota ?? 'Update Data anggota ' . $id_anggota,
             'nama_penginput' => $validated['nama_penginput'] ?? Auth::user()->name ?? 'Unknown',
             'jabatan_penginput' => $validated['jabatan_penginput'] ?? Auth::user()->jabatan ?? 'Unknown',
             'created_at' => now(), 
@@ -260,8 +246,7 @@ class DataAnggotaController extends Controller
 
         $fileName = 'data_anggota.csv';
         // Fetch all anggota data with related DPD/DPC
-        $query = DataAnggota::leftJoin('dpd', 'data_anggota.dpd_id', '=', 'dpd.id')
-            ->leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
+        $query = DataAnggota::leftJoin('dpc', 'data_anggota.dpc_id', '=', 'dpc.id')
             ->select(
                 'data_anggota.id',
                 'data_anggota.ID_Kartu',
@@ -281,11 +266,8 @@ class DataAnggotaController extends Controller
                 'data_anggota.Mengenal_Patria_Dari',
                 'data_anggota.Histori_Patria',
                 'data_anggota.Pernah_Mengikuti_PBT',
-                'dpd.nama_dpd AS Nama_DPD',
-                'dpd.kode_daerah AS Kode_DPD',
                 'dpc.nama_dpc AS Nama_DPC',
                 'dpc.kode_daerah AS Kode_DPC',
-                'data_anggota.dpd_id',
                 'data_anggota.dpc_id',
                 'data_anggota.created_at'
             );
@@ -297,8 +279,7 @@ class DataAnggotaController extends Controller
 
             // Retrieve data_anggota belonging to either DPD or DPC
             $query->where(function ($q) use ($dpcIds) {
-                $q->where('data_anggota.dpd_id', auth()->user()->dpd_id)
-                ->orWhereIn('data_anggota.dpc_id', $dpcIds);
+                $q->Wherein('data_anggota.dpc_id', $dpcIds);
             });
         } elseif (auth()->user()->jabatan == 'DPC' || auth()->user()->jabatan == 'DPAC') {
             $query->where('data_anggota.dpc_id', auth()->user()->dpc_id);
@@ -324,7 +305,7 @@ class DataAnggotaController extends Controller
                 'Kota Lahir', 'Tanggal Lahir', 'Golongan Darah', 'Gelar Akademis', 
                 'Profesi', 'Email', 'No HP', 'Alamat', 'Status Kartu', 
                 'Mengenal Patria Dari', 'Histori Patria', 'Pernah Mengikuti PBT',
-                'Nama DPD', 'Kode DPD', 'Nama DPC', 'Kode DPC', 'Created At'
+                'Nama DPC', 'Kode DPC', 'Created At'
             ]);
 
             // Add each anggota row to CSV
@@ -348,8 +329,6 @@ class DataAnggotaController extends Controller
                     $row->Mengenal_Patria_Dari,
                     $row->Histori_Patria,
                     $row->Pernah_Mengikuti_PBT ? 'Ya' : 'Tidak',
-                    $row->Nama_DPD ?: '-',
-                    $row->Kode_DPD ?: '-',
                     $row->Nama_DPC ?: '-',
                     $row->Kode_DPC ?: '-',
                     $row->created_at
@@ -420,19 +399,19 @@ class DataAnggotaController extends Controller
             'ID_Kartu (kosongkan saja apabila tidak perlu)', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
             'Email', 'No_HP', 'Jenis_Kelamin', 'Alamat', 'Kota_Lahir', 'Tanggal_Lahir',
             'Golongan_Darah', 'img_link (biarkan kosong)', 'Status_Kartu', 'Mengenal_Patria_Dari', 'Histori_Patria',
-            'Pernah_Mengikuti_PBT', 'kode_dpd(lihat dari data dpd)', 'kode_dpc(lihat dari data dpc)'
+            'Pernah_Mengikuti_PBT', 'kode_dpc(lihat dari data dpc)'
         ];
 
         $exampleRow1 = [
             '', '1234567890123456', 'Jane Doe', 'Nama Buddhis', 'S.Kom', 'Software Engineer',
             'johndoe@example.com', '08123456789', 'Laki-Laki', 'Jl. Contoh No. 123', 'Jakarta', '1990-01-01',
-            'A', '', 'belum_cetak', 'Teman', 'Pernah ikut acara', '1', '12', ''
+            'A', '', 'belum_cetak', 'Teman', 'Pernah ikut acara', '1', '1202'
         ];
 
         $exampleRow2 = [
             '', '9876543210987654', 'Jane Smith', 'Nama Buddhis 2', 'M.M', 'Data Analyst',
             'aniwijaya@example.com', '081298765432', 'Perempuan', 'Jl. Contoh No. 456', 'Bandung', '1995-05-15',
-            'B', '', 'sudah_cetak', 'Sosial Media', 'Ikut kegiatan', '0', '', '1201'
+            'B', '', 'sudah_cetak', 'Sosial Media', 'Ikut kegiatan', '0', '1201'
         ];
 
         // Convert array to CSV format
@@ -466,7 +445,7 @@ class DataAnggotaController extends Controller
             'ID_Kartu (kosongkan saja apabila tidak perlu)', 'NIK', 'Nama_Lengkap', 'Nama_Buddhis', 'Gelar_Akademis', 'Profesi',
             'Email', 'No_HP', 'Jenis_Kelamin', 'Alamat', 'Kota_Lahir', 'Tanggal_Lahir',
             'Golongan_Darah', 'img_link (biarkan kosong)','Status_Kartu', 'Mengenal_Patria_Dari', 'Histori_Patria',
-            'Pernah_Mengikuti_PBT', 'kode_dpd(lihat dari data dpd)', 'kode_dpc(lihat dari data dpc)'
+            'Pernah_Mengikuti_PBT', 'kode_dpc(lihat dari data dpc)'
         ];
 
         if ($headers !== $expectedHeaders) {
@@ -476,17 +455,16 @@ class DataAnggotaController extends Controller
 
         $dataToInsert = [];
         $now = now();
-        // dd($file);
+            // dd($headers);
         while (($row = fgetcsv($handle, 1000, ';')) !== false) {
-            $dpd_id = !empty($row[18]) ? DPD::where('kode_daerah', $row[18])->value('id') : null;
-            $dpc_id = !empty($row[19]) ? DPC::where('kode_daerah', $row[19])->value('id') : null;
+            $dpc_id = !empty($row[18]) ? DPC::where('kode_daerah', $row[18])->value('id') : null;
 
-            if (!$dpd_id && !$dpc_id) {
+            if (!$dpc_id) {
                 continue; // Skip if neither dpd_id nor dpc_id is provided
             }
 
             // Generate ID_Kartu
-            $kodeWilayah = $dpd_id ? DPD::where('id', $dpd_id)->value('kode_daerah') : DPC::where('id', $dpc_id)->value('kode_daerah');
+            $kodeWilayah = DPC::where('id', $dpc_id)->value('kode_daerah');
             $tahun = date('y');
             $lastEntry = DataAnggota::where('id', 'like', "$kodeWilayah$tahun%")
                                     ->orderBy('id', 'desc')
@@ -528,30 +506,38 @@ class DataAnggotaController extends Controller
                 'Histori_Patria' => $row[16] ?? null,
                 'img_link'=> 'uploads/anggota/' . $id_anggota . '.png',
                 'Pernah_Mengikuti_PBT' => filter_var($row[17], FILTER_VALIDATE_BOOLEAN),
-                'dpd_id' => $dpd_id,
                 'dpc_id' => $dpc_id,
             ];
         }
 
         fclose($handle);
+        try {
+            if (!empty($dataToInsert)) {
+                foreach ($dataToInsert as $data) {
+                    // Attempt to insert the data
+                    $anggota = DataAnggota::create($data);
 
-        if (!empty($dataToInsert)) {
-            foreach ($dataToInsert as $data) {
-                $anggota = DataAnggota::create($data);
-
-                InformasiAkses::create([
-                    'type' => 'create',
-                    'user_id' => Auth::id(),
-                    'keterangan' => $request->keterangan . ' anggota id ' . $anggota->id ?? 'Data anggota baru ditambahkan (upload csv) ' . $anggota->id,
-                    'nama_penginput' => $request->nama_penginput ?? Auth::user()->name ?? 'Unknown',
-                    'jabatan_penginput' => $request->jabatan_penginput ?? Auth::user()->jabatan ?? 'Unknown',
-                    'created_at' => now(),
-                ]);
+                    // Log information about the creation
+                    InformasiAkses::create([
+                        'type' => 'Create Anggota',
+                        'user_id' => Auth::id(),
+                        'keterangan' => $request->keterangan . ' anggota id ' . ($anggota->id ?? 'Data anggota baru ditambahkan (upload csv) ' . $anggota->id),
+                        'nama_penginput' => $request->nama_penginput ?? Auth::user()->name ?? 'Unknown',
+                        'jabatan_penginput' => $request->jabatan_penginput ?? Auth::user()->jabatan ?? 'Unknown',
+                        'created_at' => now(),
+                    ]);
+                }
+                return back()->with('success', count($dataToInsert) . ' anggota berhasil diimport.');
             }
-            return back()->with('success', count($dataToInsert) . ' anggota berhasil diimport.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == 23000) { // 23000 is the SQL error code for integrity constraint violation
+                return back()->withErrors(['file' => 'Gagal mengimport data: Data duplikat ditemukan. Pastikan NIK atau ID_Kartu tidak sudah ada dalam database.']);
+            }
+            return back()->withErrors(['file' => 'Terjadi kesalahan saat mengimport data: ' . $e->getMessage()]);
         }
 
         return back()->withErrors(['file' => 'Tidak ada data yang dapat diimport.']);
+
     }
 
     

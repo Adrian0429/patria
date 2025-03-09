@@ -228,7 +228,7 @@ input[type="file"]:hover {
 
             <!-- Toggle Option -->
             <div class="mb-3">
-                <label class="form-label">Choose Input Method</label>
+                <label class="form-label">Choose Input Method <span style="color: red;">*</span></label>
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="input_method" id="input_manual" value="manual" checked>
                     <label class="form-check-label" for="input_manual">Input Manually</label>
@@ -248,12 +248,12 @@ input[type="file"]:hover {
                 <input type="file" class="form-control" name="file" id="file" accept=".csv">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="nama_penginput" class="form-label">Nama Penginput</label>
+                        <label for="nama_penginput " class="form-label">Nama Penginput<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="nama_penginput" name="nama_penginput" placeholder="Nama Penginput">
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="jabatan_penginput" class="form-label">Jabatan Penginput</label>
+                        <label for="jabatan_penginput" class="form-label">Jabatan Penginput <span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="jabatan_penginput" name="jabatan_penginput" placeholder="Jabatan Penginput">
                     </div>
 
@@ -277,7 +277,7 @@ input[type="file"]:hover {
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="NIK" class="form-label">NIK</label>
+                        <label for="NIK" class="form-label">NIK <span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="NIK" name="NIK" placeholder="Enter NIK" required>
                     </div>
 
@@ -285,7 +285,7 @@ input[type="file"]:hover {
                 <div class="row">
                     
                     <div class="col-md-6 mb-3">
-                        <label for="Nama_Lengkap" class="form-label">Nama Lengkap</label>
+                        <label for="Nama_Lengkap" class="form-label">Nama Lengkap<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="Nama_Lengkap" name="Nama_Lengkap" placeholder="Enter Full Name" required>
                     </div>
                     
@@ -300,22 +300,22 @@ input[type="file"]:hover {
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Profesi" class="form-label">Profesi</label>
+                        <label for="Profesi" class="form-label">Profesi<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="Profesi" name="Profesi" placeholder="Profesi/Pekerjaan">
                     </div>
                    
                     <div class="col-md-6 mb-3">
-                        <label for="Email" class="form-label">Email</label>
+                        <label for="Email" class="form-label">Email<span style="color: red;">*</span></label>
                         <input type="email" class="form-control" id="Email" name="Email" placeholder="Enter Email" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="No_HP" class="form-label">No HP</label>
+                        <label for="No_HP" class="form-label">No HP<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="No_HP" name="No_HP" placeholder="Enter No HP" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Jenis_Kelamin" class="form-label">Jenis Kelamin</label>
+                        <label for="Jenis_Kelamin" class="form-label">Jenis Kelamin<span style="color: red;">*</span></label>
                         <select class="form-select" id="Jenis_Kelamin" name="Jenis_Kelamin" required>
                             <option value="" disabled selected>Jenis Kelamin</option>
                             <option value="Laki-laki">Laki-laki</option>
@@ -324,17 +324,17 @@ input[type="file"]:hover {
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Alamat" class="form-label">Alamat</label>
+                        <label for="Alamat" class="form-label">Alamat<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="Alamat" name="Alamat" placeholder="Alamat Tinggal" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Kota_Lahir" class="form-label">Kota Lahir</label>
+                        <label for="Kota_Lahir" class="form-label">Kota Lahir<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="Kota_Lahir" name="Kota_Lahir" placeholder="Kota Kelahiran" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Tanggal_Lahir" class="form-label">Tanggal Lahir</label>
+                        <label for="Tanggal_Lahir" class="form-label">Tanggal Lahir<span style="color: red;">*</span></label>
                         <input type="date" class="form-control" id="Tanggal_Lahir" name="Tanggal_Lahir" required>
                     </div>
 
@@ -350,17 +350,17 @@ input[type="file"]:hover {
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Mengenal_Patria_Dari" class="form-label">Mengenal Patria Dari</label>
-                        <input type="text" class="form-control" id="Mengenal_Patria_Dari" name="Mengenal_Patria_Dari" placeholder="Mengenal Patria Dari">
+                        <label for="Mengenal_Patria_Dari" class="form-label">Mengenal Patria Dari<span style="color: red;">*</span></label>
+                        <input type="text" class="form-control" id="Mengenal_Patria_Dari" name="Mengenal_Patria_Dari" placeholder="Mengenal Patria Dari" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Histori_Patria" class="form-label">Histori Patria</label>
-                        <input type="text" class="form-control" id="Histori_Patria" name="Histori_Patria" placeholder="Histori Patria">
+                        <label for="Histori_Patria" class="form-label">Histori Patria<span style="color: red;">*</span></label>
+                        <input type="text" class="form-control" id="Histori_Patria" name="Histori_Patria" placeholder="Histori Patria" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="Pernah_Mengikuti_PBT" class="form-label">Pernah Mengikuti PBT</label>
+                        <label for="Pernah_Mengikuti_PBT" class="form-label">Pernah Mengikuti PBT<span style="color: red;">*</span></label>
                         <select class="form-select" id="Pernah_Mengikuti_PBT" name="Pernah_Mengikuti_PBT" required>
                             <option value="" disabled selected>Pilih</option>
                             <option value="1">Ya</option>
@@ -369,41 +369,41 @@ input[type="file"]:hover {
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="dpd_id" class="form-label">DPD?</label>
-                        <select class="form-select" id="dpd_id" name="dpd_id">
-                            <option value="" selected>-- Pilih --</option>
-                            @foreach ($dpds as $dpd)
-                                <option value="{{ $dpd->id }}">
-                                    {{ $dpd->nama_dpd }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
                         <label for="dpc_id" class="form-label">DPC?</label>
-                        <select class="form-select" id="dpc_id" name="dpc_id">
+                        <select class="form-select" id="dpc_id" name="dpc_id" 
+                            @if (auth()->user()->jabatan == 'DPC') 
+                                disabled 
+                            @endif>
                             <option value="" selected>-- Pilih --</option>
                             @foreach ($dpcs as $dpc)
-                                <option value="{{ $dpc->id }}">
+                                <option value="{{ $dpc->id }}" 
+                                    @if (auth()->user()->jabatan == 'DPC' && auth()->user()->dpc_id == $dpc->id) 
+                                        selected
+                                    @endif>
                                     {{ $dpc->nama_dpc }}
                                 </option>
                             @endforeach
                         </select>
                     </div>
+                    
+
+                    <!-- Hidden input to send dpc_id if the select is disabled -->
+                    @if (auth()->user()->jabatan == 'DPC')
+                        <input type="hidden" name="dpc_id" value="{{ auth()->user()->dpc_id }}">
+                    @endif
 
                     <div class="col-md-6 mb-3">
-                        <label for="nama_penginput" class="form-label">Nama Penginput</label>
+                        <label for="nama_penginput" class="form-label">Nama Penginput<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="nama_penginput" name="nama_penginput" placeholder="Nama Penginput">
                     </div>
 
                     <div class="col-md-6 mb-3">
-                        <label for="jabatan_penginput" class="form-label">Jabatan Penginput</label>
+                        <label for="jabatan_penginput" class="form-label">Jabatan Penginput<span style="color: red;">*</span></label>
                         <input type="text" class="form-control" id="jabatan_penginput" name="jabatan_penginput" placeholder="Jabatan Penginput">
                     </div>
                     
                     <div class="col-md-6 mb-3">
-                        <label for="Status_Kartu" class="form-label">Status Kartu</label>
+                        <label for="Status_Kartu" class="form-label">Status Kartu<span style="color: red;">*</span></label>
                         <select class="form-select" id="Status_Kartu" name="Status_Kartu">
                             <option value="" selected>-- Pilih --</option>
                             <option value="belum_cetak">Belum Cetak</option>
@@ -417,7 +417,7 @@ input[type="file"]:hover {
                     </div>
                     
                     <div class="mb-3">
-                        <label for="image" class="form-label">Gambar</label>
+                        <label for="image" class="form-label">Gambar<span style="color: red;">*</span></label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*" onchange="previewImage(event)">
                     </div>
                     

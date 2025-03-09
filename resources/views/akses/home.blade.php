@@ -303,8 +303,9 @@
 }
 
 .top-button-container {
+    margin-top: 12px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
 }
 
 /* Style for the file input */
@@ -346,12 +347,12 @@
 
     <div class="top-button-container">
         {{-- <button class="btn-add-user" onclick="openUserModal()">Tambahkan Anggota</button> --}}
-{{--         
-        <form method="GET" action="{{ route('users.home') }}" style="margin: auto 0px;">
+        
+        <form method="GET" action="{{ route('akses.home') }}" style="margin: auto 0px;">
             <input type="text" name="search" placeholder="Cari berdasarkan nama atau email"
             value="{{ request('search') }}" class="form-control" 
             style="max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
-        </form> --}}
+        </form>
     </div>
 
     <div class="table-responsive">

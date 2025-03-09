@@ -208,6 +208,17 @@
             display: flex;
         }
     }
+
+    .desktop-only {
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .desktop-only {
+            display: none;
+        }
+    }
+
 </style>
 
 <nav class="navbar">
@@ -219,8 +230,8 @@
         <div class="links">
             <a href="/">Show</a>
             @if (Auth::check())
-            <a href="/anggota">Anggota</a>
-            <a href="/events">Event</a>
+            <a href="/anggota" class="desktop-only">Anggota</a>
+            <a href="/events" class="desktop-only">Event</a>
             @endif
 
             @if (Auth::check() && Auth::User()->jabatan == 'DPC')
@@ -228,11 +239,11 @@
             @endif
 
             @if (Auth::check() && Auth::User()->jabatan == 'admin')
-                <a href="/users">Akun</a>
-                <a href="/dpd">List DPD</a>
-                <a href="/dpc">List DPC</a>
-                <a href="/akses">Histori Akses</a>
-                <a href="/pindah_daerah">Pindah Daerah</a>
+                <a class="desktop-only" href="/users">Akun</a>
+                <a class="desktop-only" href="/dpd">List DPD</a>
+                <a class="desktop-only" href="/dpc">List DPC</a>
+                <a class="desktop-only" href="/akses">Histori Akses</a>
+                <a class="desktop-only" href="/pindah_daerah">Pindah Daerah</a>
             @endif
 
         </div>
@@ -262,14 +273,24 @@
     </div>
 
     <div class="mobile-menu" id="mobileMenu">
-        <a href="/">Home</a>
-        @if (Auth::check() && Auth::User()->role != 'Anggota')
+        <a href="/">Show</a>
+        @if (Auth::check())
+            <a href="/anggota">Anggota</a>
+            <a href="/events">Event</a>
+            @endif
+
+            @if (Auth::check() && Auth::User()->jabatan == 'DPC')
+                <a href="/pindah_daerah">Pindah Daerah</a>
+            @endif
+
+            @if (Auth::check() && Auth::User()->jabatan == 'admin')
                 <a href="/users">Akun</a>
-                <a href="/anggota">Anggota</a>
                 <a href="/dpd">List DPD</a>
                 <a href="/dpc">List DPC</a>
-                <a href="/events">Event</a>
-        @endif
+                <a href="/akses">Histori Akses</a>
+                <a href="/pindah_daerah">Pindah Daerah</a>
+            @endif
+
         @if (Auth::check())
             <form action="{{ route('logout') }}" method="POST" style="display: inline;">
                 @csrf
