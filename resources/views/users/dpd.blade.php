@@ -268,6 +268,7 @@
 }
 
 .top-button-container {
+    padding: 12px 0;
     display: flex;
     justify-content: space-between;
 }
@@ -293,12 +294,15 @@
 <div class="main-container">
 
     <div class="top-button-container">
-        <button class="btn-add-user" onclick="openCreateModal()">Tambahkan Cabang DPD</button>
+        @if (Auth::User()->jabatan == 'admin')
+           <button class="btn-add-user" onclick="openCreateModal()">Tambahkan Cabang DPD</button>
+        @endif
+        
 
         <form method="GET" action="{{ route('users.index_dpd') }}" style="margin: auto 0px;">
-            <input type="text" name="search" placeholder="Cari berdasarkan nama atau email"
+            <input type="text" name="search" placeholder="Cari disini"
             value="{{ request('search') }}" class="form-control" 
-            style="max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
+            style="min-width:300px; max-width: 500px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
         </form>
     </div>
 
@@ -309,7 +313,10 @@
                     {{-- <th>ID</th> --}}
                     <th>Nama dpd</th>
                     <th>Kode Daerah</th>
+                    @if (Auth::User()->jabatan == 'admin')
                     <th>Aksi</th>
+                    @endif
+                    
                 </tr>
             </thead>
             <tbody>
@@ -318,10 +325,13 @@
                         {{-- <td>{{ $dpd->id }}</td> --}}
                         <td>{{ $dpd->nama_dpd }}</td>
                         <td>{{ $dpd->kode_daerah }}</td>
+                        @if (Auth::User()->jabatan == 'admin')
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="openEditModal({{ $dpd->id }}, '{{ $dpd->nama_dpd }}', '{{ $dpd->kode_daerah }}')">Edit</button>
                             <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('users.destroy', $dpd->id) }}')">Delete</button>
                         </td>
+                        @endif
+                        
                     </tr>
                 @endforeach
             </tbody>

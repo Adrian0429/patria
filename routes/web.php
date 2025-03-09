@@ -58,6 +58,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/download-csv', [DataAnggotaController::class, 'exportCSV'])->name('download.csv');
     Route::post('/importCSV', [DataAnggotaController::class, 'importCSV'])->name('anggota.importCSV');
 
+    Route::get('/dpc', [UserController::class, 'index_dpc'])->name('users.index_dpc');
+    Route::get('/dpd', [UserController::class, 'index_dpd'])->name('users.index_dpd');
     Route::get('/dataDPD', [DataAnggotaController::class, 'exportDPDCSV'])->name('download.dpd');
     Route::get('/dataDPC', [DataAnggotaController::class, 'exportDPCCSV'])->name('download.dpc');
 

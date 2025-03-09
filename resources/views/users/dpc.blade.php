@@ -269,6 +269,7 @@
 }
 
 .top-button-container {
+    padding: 12px 0;
     display: flex;
     justify-content: space-between;
 }
@@ -311,12 +312,14 @@
 <div class="main-container">
 
     <div class="top-button-container">
-        <button class="btn-add-user" onclick="openCreateModal()">Tambahkan Cabang DPC</button>
-
+        @if (Auth::User()->jabatan == 'admin')
+           <button class="btn-add-user" onclick="openCreateModal()">Tambahkan Cabang DPC</button>
+        @endif
+        
         <form method="GET" action="{{ route('users.index_dpc') }}" style="margin: auto 0px;">
-            <input type="text" name="search" placeholder="Cari berdasarkan nama atau email"
+            <input type="text" name="search" placeholder="Cari disini"
             value="{{ request('search') }}" class="form-control" 
-            style="max-width: 300px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
+            style="min-width:300px; max-width: 500px; padding: 12px; border-radius: 6px; border: 1px solid black;" />
         </form>
     </div>
 
@@ -328,7 +331,9 @@
                     <th>Nama DPC</th>
                     <th>DPD</th>
                     <th>Kode Daerah</th>
-                    <th>Aksi</th>
+                    @if (Auth::User()->jabatan == 'admin')
+                        <th>Aksi</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -338,6 +343,7 @@
                         <td>{{ $dpc->nama_dpc }}</td>
                         <td>{{ $dpc->dpd->nama_dpd }}</td>
                         <td>{{ $dpc->kode_daerah }}</td>
+                        @if  (Auth::User()->jabatan == 'admin')
                         <td>
                             <button class="btn btn-warning btn-sm" 
                                 onclick="openEditModal({{ $dpc->id }}, '{{ $dpc->dpd_id }}', '{{ $dpc->nama_dpc }}', '{{ $dpc->kode_daerah }}')">
@@ -345,6 +351,8 @@
                             </button>
                             <button class="btn btn-danger btn-sm" onclick="openDeleteModal('{{ route('users.destroy', $dpc->id) }}')">Delete</button>
                         </td>
+                        @endif
+                        
                     </tr>
                 @endforeach
             </tbody>
